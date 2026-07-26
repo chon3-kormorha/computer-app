@@ -1,635 +1,756 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import Swal from 'sweetalert2';
+import { StorageEngine } from '../lib/storage';
 import { SoundEngine } from '../lib/audio';
 
-export default function TutorialScreen({ student, onGoToMap, onOpenCertificate }) {
-  const [activeTab, setActiveTab] = useState('tab-flowchart');
-  const [gradeFilter, setGradeFilter] = useState('all'); // 'all' | 'p4' | 'p5' | 'p6'
+// ── Required topics per grade track ──────────────────────────────────────────
+export const P4_TOPIC_IDS = ['p4_1','p4_2','p4_3','p4_4','p4_5','p4_6'];
+export const P5_TOPIC_IDS = ['p5_1','p5_2','p5_3','p5_4','p5_5','p5_6'];
 
+// ── Learning Content Data ─────────────────────────────────────────────────────
+const P4_TOPICS = [
+  {
+    id: 'p4_1',
+    emoji: '🖥️',
+    title: 'คอมพิวเตอร์และระบบดิจิทัลรอบตัวเรา',
+    color: '#3d4f97',
+    sections: [
+      {
+        type: 'intro',
+        text: 'ลองมองรอบๆ ตัวคุณ — มีอุปกรณ์อะไรบ้างที่ทำงานโดยอัตโนมัติ? โทรศัพท์มือถือ ไฟจราจร ตู้ ATM หรือแม้แต่เครื่องซักผ้า ล้วนเป็น "ระบบดิจิทัล" ที่ทำงานตามคำสั่ง'
+      },
+      {
+        type: 'concept_cards',
+        title: 'คอมพิวเตอร์ทำงาน 4 ขั้นตอน:',
+        items: [
+          { icon: '⌨️', label: 'รับข้อมูลเข้า (Input)', desc: 'คีย์บอร์ด, เมาส์, ไมค์, กล้อง' },
+          { icon: '⚙️', label: 'ประมวลผล (Processing)', desc: 'CPU คำนวณและตัดสินใจ' },
+          { icon: '📦', label: 'จัดเก็บข้อมูล (Storage)', desc: 'HDD, SSD, Flash Drive' },
+          { icon: '🖥️', label: 'แสดงผล (Output)', desc: 'จอภาพ, ลำโพง, เครื่องพิมพ์' }
+        ]
+      },
+      {
+        type: 'examples',
+        title: '🔍 ตัวอย่างในชีวิตประจำวัน:',
+        items: [
+          'ตู้ ATM รับรหัส PIN → ตรวจสอบ → จ่ายเงิน',
+          'ไฟจราจรนับเวลา → เปลี่ยนสี → รถวิ่งหรือหยุด',
+          'โทรศัพท์รับเสียง → แปลงเป็นข้อมูล → ส่งหาเพื่อน'
+        ]
+      },
+      {
+        type: 'think',
+        question: '🤔 ลองคิดดู: ในหนึ่งวัน คุณใช้ระบบดิจิทัลอะไรบ้าง? มีอย่างน้อย 3 อย่างได้ไหม?'
+      }
+    ]
+  },
+  {
+    id: 'p4_2',
+    emoji: '📊',
+    title: 'ข้อมูลและสารสนเทศ (Data & Information)',
+    color: '#206479',
+    sections: [
+      {
+        type: 'intro',
+        text: '"ข้อมูล" กับ "สารสนเทศ" ต่างกันอย่างไร? ตัวเลข 38 คืนข้อมูล แต่เมื่อรู้ว่าคืออุณหภูมิร่างกาย และร่างกายปกติควรอยู่ที่ 36-37 องศา — ตอนนี้ 38 กลายเป็น "สารสนเทศ" ที่บอกว่าอาจมีไข้!'
+      },
+      {
+        type: 'compare',
+        leftTitle: '📥 ข้อมูล (Data)',
+        leftItems: ['ตัวเลข ตัวอักษร ที่ยังไม่ผ่านการแปลความ', 'เช่น: 95, สีแดง, 2026-07-27'],
+        rightTitle: '📤 สารสนเทศ (Information)',
+        rightItems: ['ข้อมูลที่ผ่านการประมวลผลจนมีความหมาย', 'เช่น: คะแนน 95 = เกรด A']
+      },
+      {
+        type: 'concept_cards',
+        title: 'ประเภทของข้อมูล:',
+        items: [
+          { icon: '🔢', label: 'ตัวเลข (Number)', desc: 'คะแนน น้ำหนัก อายุ ราคา' },
+          { icon: '📝', label: 'ข้อความ (Text)', desc: 'ชื่อ ที่อยู่ คำอธิบาย' },
+          { icon: '🖼️', label: 'รูปภาพ (Image)', desc: 'ภาพถ่าย กราฟ แผนที่' },
+          { icon: '🔊', label: 'เสียง (Audio)', desc: 'เพลง เสียงพูด สัญญาณเตือน' }
+        ]
+      },
+      {
+        type: 'think',
+        question: '🤔 ลองคิดดู: คะแนนสอบ 70 คือ "ข้อมูล" หรือ "สารสนเทศ"? แล้วถ้ารู้ว่าเกณฑ์ผ่านคือ 60 ล่ะ?'
+      }
+    ]
+  },
+  {
+    id: 'p4_3',
+    emoji: '📐',
+    title: 'ผังงาน (Flowchart) สัญลักษณ์พื้นฐาน',
+    color: '#ecab37',
+    sections: [
+      {
+        type: 'intro',
+        text: 'ผังงาน (Flowchart) คือแผนภูมิที่ใช้แสดงลำดับขั้นตอนการทำงาน เราใช้ "สัญลักษณ์" มาตรฐานเพื่อให้ทุกคนเข้าใจตรงกัน ไม่ว่าจะอยู่ที่ไหนในโลก'
+      },
+      {
+        type: 'symbol_grid',
+        symbols: [
+          { shape: 'oval',      color: '#ecab37', name: 'Start / Stop',   desc: 'จุดเริ่มต้นและสิ้นสุดของผังงาน' },
+          { shape: 'rectangle', color: '#3d4f97', name: 'Process',        desc: 'การทำงาน คำนวณ หรือประมวลผล' },
+          { shape: 'diamond',   color: '#f68d1f', name: 'Decision',       desc: 'การตัดสินใจ มีทางแยก ใช่/ไม่ใช่' },
+          { shape: 'arrow',     color: '#206479', name: 'Flow Line',      desc: 'ลูกศรบอกทิศทางการไหลของงาน' }
+        ]
+      },
+      {
+        type: 'flowchart_demo',
+        title: '📖 ตัวอย่าง: ผังงานการเปิดประตูด้วยรหัส',
+        steps: ['Start', 'กดรหัส 4 หลัก', 'รหัสถูกต้อง?', 'เปิดประตู', 'Stop']
+      },
+      {
+        type: 'think',
+        question: '🤔 ลองคิดดู: ถ้าสัญลักษณ์ที่ใช้ไม่เป็นมาตรฐาน จะเกิดปัญหาอะไรกับคนที่อ่านผังงาน?'
+      }
+    ]
+  },
+  {
+    id: 'p4_4',
+    emoji: '🔄',
+    title: 'อัลกอริทึม — ขั้นตอนการแก้ปัญหา',
+    color: '#15803d',
+    sections: [
+      {
+        type: 'intro',
+        text: 'อัลกอริทึม (Algorithm) คือชุดของคำสั่งที่ชัดเจน เรียงลำดับ และสิ้นสุดได้ เพื่อแก้ปัญหาใดปัญหาหนึ่ง เหมือนสูตรทำอาหาร — ถ้าขั้นตอนสลับกัน อาหารจะไม่อร่อย!'
+      },
+      {
+        type: 'concept_cards',
+        title: 'อัลกอริทึมที่ดีต้องมี 3 คุณสมบัติ:',
+        items: [
+          { icon: '✅', label: 'ชัดเจน (Clear)', desc: 'แต่ละขั้นตอนต้องไม่คลุมเครือ' },
+          { icon: '🔢', label: 'เรียงลำดับ (Ordered)', desc: 'ทำตามลำดับจนครบทุกขั้น' },
+          { icon: '🏁', label: 'สิ้นสุดได้ (Finite)', desc: 'ต้องมีจุดสิ้นสุด ไม่วนไม่รู้จบ' }
+        ]
+      },
+      {
+        type: 'examples',
+        title: '🍳 ตัวอย่างอัลกอริทึมในชีวิตจริง:',
+        items: [
+          'การต้มข้าว: ล้างข้าว → ใส่น้ำ → ตั้งไฟ → รอสุก → ปิดไฟ',
+          'การแปรงฟัน: บีบยาสีฟัน → แปรง 2 นาที → บ้วนปาก',
+          'การข้ามถนน: มองซ้าย → มองขวา → มองซ้ายอีกครั้ง → ข้ามเมื่อปลอดภัย'
+        ]
+      },
+      {
+        type: 'think',
+        question: '🤔 ลองคิดดู: เขียนอัลกอริทึมการล้างมือของตัวเองออกมาเป็นขั้นตอน ใช้กี่ขั้น?'
+      }
+    ]
+  },
+  {
+    id: 'p4_5',
+    emoji: '🌐',
+    title: 'การสืบค้นข้อมูลบนอินเทอร์เน็ต',
+    color: '#e60012',
+    sections: [
+      {
+        type: 'intro',
+        text: 'อินเทอร์เน็ตมีข้อมูลมหาศาล แต่ไม่ใช่ทุกข้อมูลที่ถูกต้อง! การสืบค้นที่ดีต้องรู้จักเลือก Keyword ที่เหมาะสมและประเมินแหล่งข้อมูลก่อนเชื่อ'
+      },
+      {
+        type: 'compare',
+        leftTitle: '❌ Keyword ที่ไม่ดี',
+        leftItems: ['"ต้องการข้อมูลเรื่องอากาศ"', '"ผลไม้อะไรกินแล้วดี"', '"อยากรู้เรื่องโรค"'],
+        rightTitle: '✅ Keyword ที่ดี',
+        rightItems: ['"พยากรณ์อากาศ กรุงเทพ วันนี้"', '"วิตามิน C ผลไม้ไทย"', '"ไข้หวัดใหญ่ สาเหตุ อาการ"']
+      },
+      {
+        type: 'concept_cards',
+        title: 'โดเมนบอกประเภทของเว็บไซต์:',
+        items: [
+          { icon: '🏛️', label: '.go.th', desc: 'หน่วยงานภาครัฐ — น่าเชื่อถือสูง' },
+          { icon: '🎓', label: '.ac.th', desc: 'สถาบันการศึกษา — น่าเชื่อถือสูง' },
+          { icon: '🏢', label: '.or.th', desc: 'องค์กรเอกชนไม่แสวงกำไร' },
+          { icon: '🏪', label: '.co.th', desc: 'บริษัทเอกชน — ตรวจสอบก่อนเชื่อ' }
+        ]
+      },
+      {
+        type: 'think',
+        question: '🤔 ลองคิดดู: ถ้าเจอข้อมูล "วัคซีนทำให้เป็นออทิสติก" บนเว็บไซต์ไม่รู้จัก ควรทำอย่างไรก่อนแชร์?'
+      }
+    ]
+  },
+  {
+    id: 'p4_6',
+    emoji: '🔒',
+    title: 'ความปลอดภัยและจริยธรรมดิจิทัล',
+    color: '#1e293b',
+    sections: [
+      {
+        type: 'intro',
+        text: 'ทักษะสำคัญในยุคดิจิทัลคือการ "ปกป้องตัวเอง" ออนไลน์ — รหัสผ่านที่แข็งแกร่ง ข้อมูลส่วนตัวที่ไม่แชร์สุ่มสี่สุ่มห้า และการปฏิบัติตนที่ดีต่อผู้อื่นในโลกออนไลน์'
+      },
+      {
+        type: 'concept_cards',
+        title: 'รหัสผ่านที่แข็งแกร่งต้องมี:',
+        items: [
+          { icon: '🔤', label: 'ตัวอักษรพิมพ์ใหญ่-เล็ก', desc: 'เช่น A, b, Z, m' },
+          { icon: '🔢', label: 'ตัวเลข', desc: 'เช่น 0-9 อย่างน้อย 2 ตัว' },
+          { icon: '✨', label: 'สัญลักษณ์พิเศษ', desc: 'เช่น @, #, !, %, $' },
+          { icon: '📏', label: 'ความยาว ≥ 8 ตัวอักษร', desc: 'และไม่ใช่ชื่อหรือวันเกิดตัวเอง' }
+        ]
+      },
+      {
+        type: 'examples',
+        title: '🛡️ หลักปฏิบัติออนไลน์ที่ดี:',
+        items: [
+          'ไม่บอกรหัสผ่านแก่ใครทั้งนั้น แม้แต่เพื่อนสนิท',
+          'ไม่ส่งรูปหรือข้อมูลส่วนตัวให้คนแปลกหน้า',
+          'ไม่แชร์ข่าวที่ยังไม่ได้ตรวจสอบ',
+          'ปฏิบัติต่อคนอื่นออนไลน์เหมือนพบหน้ากัน'
+        ]
+      },
+      {
+        type: 'think',
+        question: '🤔 ลองคิดดู: ถ้าได้รับข้อความ "ส่งรหัสผ่านมาเพื่อปลดบัญชี" จากคนอ้างว่าเป็นทีมงาน ควรทำอย่างไร?'
+      }
+    ]
+  }
+];
+
+const P5_TOPICS = [
+  {
+    id: 'p5_1',
+    emoji: '🧮',
+    title: 'การคิดเชิงคำนวณ (Computational Thinking)',
+    color: '#3d4f97',
+    sections: [
+      {
+        type: 'intro',
+        text: 'การคิดเชิงคำนวณ ไม่ได้หมายความว่าต้องคิดเลขเก่ง แต่หมายถึงการคิดวิเคราะห์ปัญหาอย่างเป็นระบบ — แบบที่คอมพิวเตอร์ (หรือนักวิทยาศาสตร์คอมพิวเตอร์) ใช้แก้ปัญหา'
+      },
+      {
+        type: 'concept_cards',
+        title: '4 หัวใจของการคิดเชิงคำนวณ:',
+        items: [
+          { icon: '✂️', label: 'การแยกย่อย (Decomposition)', desc: 'แบ่งปัญหาใหญ่ให้เป็นปัญหาเล็กๆ' },
+          { icon: '🔍', label: 'การหารูปแบบ (Pattern Recognition)', desc: 'มองหาความซ้ำซากหรือความสัมพันธ์' },
+          { icon: '🎯', label: 'การคิดแบบนามธรรม (Abstraction)', desc: 'ตัดรายละเอียดที่ไม่สำคัญออก' },
+          { icon: '📋', label: 'การออกแบบอัลกอริทึม (Algorithm)', desc: 'วางขั้นตอนแก้ปัญหาอย่างมีระบบ' }
+        ]
+      },
+      {
+        type: 'examples',
+        title: '🌟 ตัวอย่าง CT ในชีวิตจริง:',
+        items: [
+          'การแบ่งงานโปรเจกต์กลุ่ม = Decomposition',
+          'สังเกตว่าไข้มักมาพร้อมอาการอื่น = Pattern Recognition',
+          'แผนที่ตัดรายละเอียดบ้านทุกหลังออก เหลือแค่ถนน = Abstraction'
+        ]
+      },
+      {
+        type: 'think',
+        question: '🤔 ลองคิดดู: การสั่งพิซซ่าออนไลน์ใช้ CT ทั้ง 4 อย่างอย่างไรบ้าง?'
+      }
+    ]
+  },
+  {
+    id: 'p5_2',
+    emoji: '📐',
+    title: 'สัญลักษณ์ Flowchart ขั้นสูงทั้งหมด',
+    color: '#ecab37',
+    sections: [
+      {
+        type: 'intro',
+        text: 'ผังงานในระดับที่ซับซ้อนขึ้นต้องใช้สัญลักษณ์เพิ่มเติมนอกจาก 4 อย่างพื้นฐาน เพื่อแสดงการรับข้อมูล, การแสดงผล และจุดเชื่อมต่อ'
+      },
+      {
+        type: 'symbol_grid',
+        symbols: [
+          { shape: 'oval',      color: '#ecab37', name: 'Start / Stop',   desc: 'จุดเริ่มต้น/สิ้นสุด' },
+          { shape: 'rectangle', color: '#3d4f97', name: 'Process',        desc: 'ประมวลผล/คำนวณ' },
+          { shape: 'diamond',   color: '#f68d1f', name: 'Decision',       desc: 'ตัดสินใจ/เงื่อนไข' },
+          { shape: 'trapezoid', color: '#acace7', name: 'Manual Input',   desc: 'ป้อนข้อมูลทางคีย์บอร์ด' },
+          { shape: 'display',   color: '#8ba1d4', name: 'Display',        desc: 'แสดงผลบนจอภาพ' },
+          { shape: 'circle',    color: '#e60012', name: 'Connector',      desc: 'จุดเชื่อมต่อผังงาน' },
+          { shape: 'arrow',     color: '#206479', name: 'Flow Line',      desc: 'ทิศทางการไหล' }
+        ]
+      },
+      {
+        type: 'think',
+        question: '🤔 ลองคิดดู: ระหว่าง "Manual Input" กับ "Process" ต่างกันอย่างไร? ให้ยกตัวอย่างประกอบ'
+      }
+    ]
+  },
+  {
+    id: 'p5_3',
+    emoji: '💻',
+    title: 'ผังงานกับการวิเคราะห์เงื่อนไขซับซ้อน',
+    color: '#15803d',
+    sections: [
+      {
+        type: 'intro',
+        text: 'ผังงานขั้นสูงมักมี "เงื่อนไขซ้อน" (Nested Decision) และ "วงวน" (Loop) เช่น โปรแกรมถามรหัสผ่านซ้ำจนกว่าจะถูก — เราต้องอ่านผังงานแบบ "เดินตามลูกศร" ไปทีละขั้น'
+      },
+      {
+        type: 'concept_cards',
+        title: 'โครงสร้างพื้นฐานในผังงาน:',
+        items: [
+          { icon: '➡️', label: 'Sequential (ลำดับ)', desc: 'ทำทีละขั้นตอนจากบนลงล่าง' },
+          { icon: '↙️↗️', label: 'Selection (เลือก)', desc: 'IF-THEN-ELSE แยกทางตามเงื่อนไข' },
+          { icon: '🔁', label: 'Repetition (วน)', desc: 'LOOP วนซ้ำจนตรงตามเงื่อนไข' }
+        ]
+      },
+      {
+        type: 'examples',
+        title: '📖 ตัวอย่าง: ผังงานระบบตรวจสอบอายุ',
+        items: [
+          'รับอายุ → อายุ ≥ 18 หรือไม่? → ใช่: เข้าได้ / ไม่ใช่: ไม่อนุญาต',
+          'ระบบ ATM: กรอก PIN → ถูกต้อง? → ไม่ใช่: กรอกใหม่ (วน 3 ครั้ง) → ล็อกบัตร'
+        ]
+      },
+      {
+        type: 'think',
+        question: '🤔 ลองคิดดู: ผังงานต้มบะหมี่ที่มีเงื่อนไข "ต้มครบ 3 นาทีหรือยัง?" เป็นโครงสร้างแบบใด?'
+      }
+    ]
+  },
+  {
+    id: 'p5_4',
+    emoji: '🔍',
+    title: 'การประเมินและเปรียบเทียบข้อมูลออนไลน์',
+    color: '#f68d1f',
+    sections: [
+      {
+        type: 'intro',
+        text: 'ในยุคที่ข้อมูลท่วมโลก ทักษะสำคัญคือ "วิเคราะห์ข้อมูลก่อนเชื่อ" — ไม่ใช่ทุกข้อมูลที่แชร์มาจากเพื่อนสนิทจะถูกต้อง และไม่ใช่ทุกเว็บไซต์ที่สวยงามจะน่าเชื่อถือ'
+      },
+      {
+        type: 'concept_cards',
+        title: '5 เกณฑ์ตรวจสอบข้อมูล (5C Framework):',
+        items: [
+          { icon: '👤', label: 'Creator (ผู้สร้าง)', desc: 'ใครเขียน? มีความน่าเชื่อถือไหม?' },
+          { icon: '⏰', label: 'Currency (ความทันสมัย)', desc: 'ข้อมูลเก่าเกินไปหรือเปล่า?' },
+          { icon: '📌', label: 'Coverage (ครอบคลุม)', desc: 'พูดถึงเรื่องนี้ครบถ้วนไหม?' },
+          { icon: '🎯', label: 'Credibility (น่าเชื่อถือ)', desc: 'มีแหล่งอ้างอิงหรือเปล่า?' }
+        ]
+      },
+      {
+        type: 'compare',
+        leftTitle: '⚠️ สัญญาณ Fake News:',
+        leftItems: ['หัวข้อเกินจริง ตัวใหญ่พิมพ์ใหญ่ทั้งหมด', 'ไม่ระบุชื่อผู้เขียน', 'กระตุ้นให้รีบแชร์ทันที', 'ขัดกับสื่อกระแสหลักหลายแห่ง'],
+        rightTitle: '✅ สัญญาณข้อมูลน่าเชื่อถือ:',
+        rightItems: ['ระบุชื่อผู้เขียนและองค์กร', 'อ้างอิงแหล่งข้อมูล', 'วันที่เผยแพร่ชัดเจน', 'สอดคล้องกับแหล่งอื่น']
+      },
+      {
+        type: 'think',
+        question: '🤔 ลองคิดดู: เพื่อนส่งข่าวว่า "กินกล้วยตอนเช้าทำให้ IQ สูงขึ้น 20%" คุณจะตรวจสอบอย่างไร?'
+      }
+    ]
+  },
+  {
+    id: 'p5_5',
+    emoji: '🛡️',
+    title: 'Cyberbullying และการปกป้องตัวเองออนไลน์',
+    color: '#e60012',
+    sections: [
+      {
+        type: 'intro',
+        text: 'Cyberbullying คือการกลั่นแกล้งผ่านช่องทางดิจิทัล — ส่งข้อความด่าทอ แชร์รูปโดยไม่ยินยอม หรือโพสต์เรื่องราวเท็จ ผลกระทบร้ายแรงไม่แพ้การกลั่นแกล้งในชีวิตจริง'
+      },
+      {
+        type: 'concept_cards',
+        title: 'รูปแบบ Cyberbullying ที่พบบ่อย:',
+        items: [
+          { icon: '💬', label: 'Harassment', desc: 'ส่งข้อความด่าทอ ข่มขู่ ซ้ำๆ' },
+          { icon: '📸', label: 'Image Shaming', desc: 'แชร์รูปหรือวิดีโอโดยไม่ยินยอม' },
+          { icon: '👤', label: 'Impersonation', desc: 'แอบอ้างเป็นคนอื่นเพื่อทำร้าย' },
+          { icon: '🚪', label: 'Exclusion', desc: 'จงใจกีดกันออกจากกลุ่ม' }
+        ]
+      },
+      {
+        type: 'examples',
+        title: '🆘 เมื่อเผชิญ Cyberbullying ให้:',
+        items: [
+          'บันทึกหลักฐาน (screenshot) ไว้ก่อน',
+          'ไม่โต้ตอบด้วยความโกรธ — ยิ่งตอบยิ่งแย่',
+          'รายงาน (Report) และบล็อก (Block) คนนั้น',
+          'แจ้งผู้ปกครองหรือครูที่ไว้วางใจได้ทันที'
+        ]
+      },
+      {
+        type: 'think',
+        question: '🤔 ลองคิดดู: ถ้าเห็นเพื่อนถูกกลั่นแกล้งในกลุ่มไลน์ห้อง คุณจะทำอะไรได้บ้าง?'
+      }
+    ]
+  },
+  {
+    id: 'p5_6',
+    emoji: '⚖️',
+    title: 'สิทธิ์ ลิขสิทธิ์ และจริยธรรมดิจิทัล',
+    color: '#206479',
+    sections: [
+      {
+        type: 'intro',
+        text: 'ข้อมูล รูปภาพ เพลง หรือโค้ดที่คนอื่นสร้างขึ้น ล้วนมี "ลิขสิทธิ์" คุ้มครอง — การนำไปใช้โดยไม่ได้รับอนุญาตถือเป็นการละเมิดกฎหมาย แม้จะทำบนโลกดิจิทัล'
+      },
+      {
+        type: 'concept_cards',
+        title: 'ประเภทของลิขสิทธิ์ที่ควรรู้:',
+        items: [
+          { icon: '©️', label: 'Copyright', desc: 'สงวนสิทธิ์ทุกอย่าง ต้องขออนุญาตก่อนใช้' },
+          { icon: '🌐', label: 'Creative Commons', desc: 'ผู้สร้างกำหนดเงื่อนไขการใช้งานเอง' },
+          { icon: '🔓', label: 'Public Domain', desc: 'ใช้ได้เสรี ไม่มีลิขสิทธิ์แล้ว' },
+          { icon: '📂', label: 'Open Source', desc: 'ใช้ แก้ไข และแบ่งปันโค้ดได้' }
+        ]
+      },
+      {
+        type: 'examples',
+        title: '✅ จริยธรรมดิจิทัลที่ดี:',
+        items: [
+          'อ้างอิงแหล่งที่มาทุกครั้งที่ใช้ข้อมูลของผู้อื่น',
+          'ขออนุญาตก่อนแชร์รูปถ่ายที่มีคนอื่นอยู่ด้วย',
+          'ไม่ดาวน์โหลดซอฟต์แวร์หรือเนื้อหาละเมิดลิขสิทธิ์',
+          'เคารพความเป็นส่วนตัวของผู้อื่นทั้งออนไลน์และออฟไลน์'
+        ]
+      },
+      {
+        type: 'think',
+        question: '🤔 ลองคิดดู: ถ้าต้องทำรายงานและเอารูปจากอินเทอร์เน็ตมาใช้ ควรทำอะไรก่อน?'
+      }
+    ]
+  }
+];
+
+// ── SVG Symbol Renderer ───────────────────────────────────────────────────────
+function SymbolSVG({ shape, color, size = 100 }) {
+  let path = '';
+  const h = size * 0.5;
+  switch (shape) {
+    case 'oval':      path = `<rect x="5" y="${h*0.1}" width="${size-10}" height="${h*0.8}" rx="${h*0.4}" fill="${color}" stroke="#fff" stroke-width="2.5"/>`; break;
+    case 'rectangle': path = `<rect x="5" y="${h*0.1}" width="${size-10}" height="${h*0.8}" rx="6" fill="${color}" stroke="#fff" stroke-width="2.5"/>`; break;
+    case 'diamond':   path = `<polygon points="${size/2},4 ${size-4},${h} ${size/2},${size-4} 4,${h}" fill="${color}" stroke="#fff" stroke-width="2.5"/>`; break;
+    case 'trapezoid': path = `<polygon points="15,${h*0.1} ${size-5},${h*0.1} ${size-15},${h*0.9} 5,${h*0.9}" fill="${color}" stroke="#fff" stroke-width="2.5"/>`; break;
+    case 'display':   path = `<path d="M5,${h*0.1} L${size-15},${h*0.1} C${size},${h*0.1} ${size},${h*0.9} ${size-15},${h*0.9} L5,${h*0.9} Q${size*0.25},${h} 5,${h*0.1} Z" fill="${color}" stroke="#fff" stroke-width="2.5"/>`; break;
+    case 'circle':    path = `<circle cx="${size/2}" cy="${h}" r="${h*0.4}" fill="${color}" stroke="#fff" stroke-width="2.5"/>`; break;
+    case 'arrow':     path = `<path d="M8,${h} L${size-16},${h} M${size-30},${h*0.6} L${size-8},${h} L${size-30},${h*1.4}" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`; break;
+    default:          path = `<rect x="5" y="${h*0.1}" width="${size-10}" height="${h*0.8}" rx="6" fill="${color}" stroke="#fff" stroke-width="2.5"/>`;
+  }
+  return (
+    <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} xmlns="http://www.w3.org/2000/svg"
+      dangerouslySetInnerHTML={{ __html: path }} />
+  );
+}
+
+// ── Section Renderers ─────────────────────────────────────────────────────────
+function renderSection(section, idx) {
+  switch (section.type) {
+    case 'intro':
+      return (
+        <div key={idx} style={{ background: '#f0f9ff', border: '2px solid #38bdf8', borderRadius: '12px', padding: '16px', marginBottom: '14px' }}>
+          <p style={{ fontSize: '15px', lineHeight: 1.7, color: '#0c4a6e', margin: 0 }}>{section.text}</p>
+        </div>
+      );
+    case 'concept_cards':
+      return (
+        <div key={idx} style={{ marginBottom: '14px' }}>
+          <h4 style={{ fontSize: '14px', fontWeight: 'bold', color: '#1e293b', marginBottom: '10px' }}>{section.title}</h4>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px' }}>
+            {section.items.map((item, i) => (
+              <div key={i} style={{ background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '10px', padding: '12px', boxShadow: '0 2px 6px rgba(0,0,0,0.05)' }}>
+                <div style={{ fontSize: '24px', marginBottom: '6px' }}>{item.icon}</div>
+                <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#1e293b', marginBottom: '4px' }}>{item.label}</div>
+                <div style={{ fontSize: '12px', color: '#64748b' }}>{item.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    case 'examples':
+      return (
+        <div key={idx} style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: '12px', padding: '14px', marginBottom: '14px' }}>
+          <h4 style={{ fontSize: '14px', fontWeight: 'bold', color: '#14532d', marginBottom: '8px' }}>{section.title}</h4>
+          <ul style={{ margin: 0, paddingLeft: '20px' }}>
+            {section.items.map((item, i) => (
+              <li key={i} style={{ fontSize: '14px', color: '#166534', marginBottom: '5px', lineHeight: 1.5 }}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      );
+    case 'compare':
+      return (
+        <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
+          <div style={{ background: '#fef2f2', border: '2px solid #fca5a5', borderRadius: '10px', padding: '12px' }}>
+            <h4 style={{ fontSize: '13px', fontWeight: 'bold', color: '#991b1b', marginBottom: '8px' }}>{section.leftTitle}</h4>
+            <ul style={{ margin: 0, paddingLeft: '16px' }}>
+              {section.leftItems.map((item, i) => <li key={i} style={{ fontSize: '12px', color: '#7f1d1d', marginBottom: '4px' }}>{item}</li>)}
+            </ul>
+          </div>
+          <div style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: '10px', padding: '12px' }}>
+            <h4 style={{ fontSize: '13px', fontWeight: 'bold', color: '#14532d', marginBottom: '8px' }}>{section.rightTitle}</h4>
+            <ul style={{ margin: 0, paddingLeft: '16px' }}>
+              {section.rightItems.map((item, i) => <li key={i} style={{ fontSize: '12px', color: '#166534', marginBottom: '4px' }}>{item}</li>)}
+            </ul>
+          </div>
+        </div>
+      );
+    case 'symbol_grid':
+      return (
+        <div key={idx} style={{ marginBottom: '14px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '10px' }}>
+            {section.symbols.map((sym, i) => (
+              <div key={i} style={{ background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '10px', padding: '10px', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.05)' }}>
+                <SymbolSVG shape={sym.shape} color={sym.color} size={70} />
+                <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#1e293b', marginTop: '6px' }}>{sym.name}</div>
+                <div style={{ fontSize: '11px', color: '#64748b', marginTop: '3px' }}>{sym.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    case 'think':
+      return (
+        <div key={idx} style={{ background: 'linear-gradient(135deg, #fef3c7, #fde68a)', border: '2px solid #f59e0b', borderRadius: '12px', padding: '14px', marginBottom: '14px' }}>
+          <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#78350f', margin: 0, lineHeight: 1.6 }}>{section.question}</p>
+        </div>
+      );
+    default:
+      return null;
+  }
+}
+
+// ── Main TutorialScreen Component ─────────────────────────────────────────────
+export default function TutorialScreen({ student, onGoToMap, onOpenCertificate }) {
+  const gradeTrack = student?.grade?.startsWith('ป.5') || student?.grade?.startsWith('ป.6') ? 'p5' : 'p4';
+  const topics = gradeTrack === 'p5' ? P5_TOPICS : P4_TOPICS;
+  const requiredIds = gradeTrack === 'p5' ? P5_TOPIC_IDS : P4_TOPIC_IDS;
+
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [confirmedIds, setConfirmedIds] = useState([]);
+  const [timeOnTopic, setTimeOnTopic] = useState(0);
+  const timerRef = useRef(null);
+
+  const currentTopic = topics[currentIdx];
+  const isCurrentConfirmed = confirmedIds.includes(currentTopic?.id);
+  const allDone = requiredIds.every(id => confirmedIds.includes(id));
+  const canReadNext = isCurrentConfirmed && currentIdx < topics.length - 1;
+
+  // Initialize confirmedIds from student data
   useEffect(() => {
-    if (student && student.grade) {
-      if (student.grade.startsWith('ป.4')) setGradeFilter('p4');
-      else if (student.grade.startsWith('ป.5')) setGradeFilter('p5');
-      else if (student.grade.startsWith('ป.6')) setGradeFilter('p6');
-    }
+    const saved = student?.tutorialTopicsCompleted || [];
+    setConfirmedIds(Array.isArray(saved) ? saved : []);
   }, [student]);
 
-  const switchTab = (tabId) => {
-    SoundEngine.playClick();
-    setActiveTab(tabId);
+  // Timer for current topic
+  useEffect(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (!isCurrentConfirmed) {
+      setTimeOnTopic(0);
+      timerRef.current = setInterval(() => {
+        setTimeOnTopic(prev => prev + 1);
+      }, 1000);
+    } else {
+      setTimeOnTopic(61); // already confirmed, show as complete
+    }
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [currentIdx, isCurrentConfirmed]);
+
+  const handleConfirm = useCallback(async () => {
+    if (timeOnTopic < 60) return;
+    SoundEngine.playCorrect();
+    const newConfirmed = [...new Set([...confirmedIds, currentTopic.id])];
+    setConfirmedIds(newConfirmed);
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    await StorageEngine.saveStudentProgress({ tutorialTopicsCompleted: newConfirmed });
+
+    if (newConfirmed.length >= requiredIds.length) {
+      Swal.fire({
+        icon: 'success',
+        title: '🎉 เรียนรู้ครบทุกบทแล้ว!',
+        text: 'ยอดเยี่ยมมาก! ตอนนี้คุณสามารถเล่นด่านเกมส์ทั้งหมดได้แล้ว',
+        confirmButtonText: 'ไปหน้าแผนที่ด่าน ➔',
+        customClass: { popup: 'swal-y2k-popup', title: 'swal-y2k-title', confirmButton: 'btn-y2k btn-signal' }
+      }).then(() => onGoToMap());
+    } else if (currentIdx < topics.length - 1) {
+      setTimeout(() => setCurrentIdx(prev => prev + 1), 400);
+    }
+  }, [timeOnTopic, confirmedIds, currentTopic, currentIdx, topics.length, requiredIds.length, onGoToMap]);
+
+  const handleSelectTopic = (idx) => {
+    const isUnlocked = idx === 0 || confirmedIds.includes(topics[idx - 1]?.id);
+    if (!isUnlocked) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'ล็อกอยู่!',
+        text: 'กรุณาเรียนรู้บทก่อนหน้าและยืนยันให้ครบก่อนนะครับ',
+        customClass: { popup: 'swal-y2k-popup' }
+      });
+      return;
+    }
+    setCurrentIdx(idx);
   };
 
-  const handleSelectGrade = (g) => {
-    SoundEngine.playClick();
-    setGradeFilter(g);
-  };
+  const secondsRemaining = Math.max(0, 60 - timeOnTopic);
+  const timerPercent = Math.min(100, (timeOnTopic / 60) * 100);
 
   return (
     <section className="screen-view">
-      {/* HERO PANEL */}
-      <div
-        className="hero-panel"
-        style={{ background: 'linear-gradient(135deg, #1b4332 0%, #2d6a4f 50%, #1e5f74 100%)', color: '#ffffff' }}
-      >
-        <h2 className="hero-display-title">📚 คลังความรู้วิชาวิทยาการคำนวณ</h2>
-        <p style={{ fontSize: '14px', fontWeight: 'bold', marginTop: '6px', lineHeight: 1.5 }}>
-          💡 หลักสูตรสาระเทคโนโลยี (วิทยาการคำนวณ) แยกสรุปตามระดับสายชั้น ป.4, ป.5 และ ป.6
-          ตามคู่มือการจัดการเรียนรู้ สสวท. โรงเรียนบ้าน กม.ห้า
+      {/* HEADER */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <button className="btn-y2k btn-carbon btn-sm" onClick={onGoToMap}>◀ กลับหน้าแผนที่</button>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <span className="status-badge ready" style={{ fontSize: '12px' }}>
+            {gradeTrack === 'p5' ? '🎒 ป.5-ป.6' : '🎒 ป.4'}
+          </span>
+          <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#334155' }}>
+            เรียนรู้แล้ว {confirmedIds.filter(id => requiredIds.includes(id)).length} / {requiredIds.length} บท
+          </span>
+        </div>
+      </div>
+
+      <div className="hero-panel" style={{ background: 'linear-gradient(135deg, #1b4332 0%, #2d6a4f 50%, #1e5f74 100%)', marginBottom: '16px', padding: '14px 18px' }}>
+        <h2 className="hero-display-title" style={{ fontSize: '18px', margin: 0 }}>📚 คลังเรียนรู้วิทยาการคำนวณ</h2>
+        <p style={{ fontSize: '13px', color: '#a7f3d0', marginTop: '4px' }}>
+          เรียนรู้ให้ครบทุกบทเพื่อปลดล็อกด่านเกมส์ — ต้องใช้เวลาอย่างน้อย 60 วินาทีต่อบท และยืนยันการเรียนรู้ก่อน
         </p>
       </div>
 
-      {/* GRADE FILTER SELECTOR BAR */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          background: '#ffffff',
-          padding: '10px 16px',
-          borderRadius: '12px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
-          marginBottom: '16px',
-          flexWrap: 'wrap'
-        }}
-      >
-        <span style={{ fontWeight: 'bold', fontSize: '13px', color: '#1e293b' }}>
-          🏫 สายชั้นเรียนที่เลือกดู:
-        </span>
+      <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '16px' }}>
 
-        <button
-          className={`btn-y2k btn-sm ${gradeFilter === 'all' ? 'btn-amber' : 'btn-carbon'}`}
-          onClick={() => handleSelectGrade('all')}
-        >
-          🌟 แสดงเนื้อหารวมทุกชั้น
-        </button>
-
-        <button
-          className={`btn-y2k btn-sm ${gradeFilter === 'p4' ? 'btn-signal' : 'btn-carbon'}`}
-          onClick={() => handleSelectGrade('p4')}
-        >
-          🎒 ชั้นประถมศึกษาปีที่ 4
-        </button>
-
-        <button
-          className={`btn-y2k btn-sm ${gradeFilter === 'p5' ? 'btn-signal' : 'btn-carbon'}`}
-          onClick={() => handleSelectGrade('p5')}
-        >
-          🎒 ชั้นประถมศึกษาปีที่ 5
-        </button>
-
-        <button
-          className={`btn-y2k btn-sm ${gradeFilter === 'p6' ? 'btn-signal' : 'btn-carbon'}`}
-          onClick={() => handleSelectGrade('p6')}
-        >
-          🎒 ชั้นประถมศึกษาปีที่ 6
-        </button>
-
-        {student && (
-          <span style={{ marginLeft: 'auto', fontSize: '12px', color: 'var(--systems-teal)', fontWeight: 'bold' }}>
-            👤 นักเรียน: {student.name} ({student.grade})
-          </span>
-        )}
-      </div>
-
-      {/* TUTORIAL TABS NAVIGATION */}
-      <div className="tutorial-nav-container">
-        <button
-          className={`btn-y2k tutorial-tab-btn ${activeTab === 'tab-flowchart' ? 'btn-amber active' : 'btn-carbon'}`}
-          onClick={() => switchTab('tab-flowchart')}
-        >
-          🔷 1. สัญลักษณ์ Flowchart (8 สัญลักษณ์)
-        </button>
-        <button
-          className={`btn-y2k tutorial-tab-btn ${activeTab === 'tab-thinking' ? 'btn-amber active' : 'btn-carbon'}`}
-          onClick={() => switchTab('tab-thinking')}
-        >
-          🧠 2. การคิดเชิงคำนวณ (4 ด้าน)
-        </button>
-        <button
-          className={`btn-y2k tutorial-tab-btn ${activeTab === 'tab-curriculum' ? 'btn-amber active' : 'btn-carbon'}`}
-          onClick={() => switchTab('tab-curriculum')}
-        >
-          📘 3. เนื้อหาหลักสูตรเฉพาะสายชั้น {gradeFilter !== 'all' ? `(${gradeFilter.toUpperCase()})` : ''}
-        </button>
-        <button
-          className={`btn-y2k tutorial-tab-btn ${activeTab === 'tab-safety' ? 'btn-amber active' : 'btn-carbon'}`}
-          onClick={() => switchTab('tab-safety')}
-        >
-          🛡️ 4. ไอทีปลอดภัย & ไซเบอร์
-        </button>
-        <button
-          className={`btn-y2k tutorial-tab-btn ${activeTab === 'tab-real-flowchart' ? 'btn-amber active' : 'btn-carbon'}`}
-          onClick={() => switchTab('tab-real-flowchart')}
-        >
-          📊 5. ผังงานตัวอย่างแบบจริง
-        </button>
-        <button
-          className={`btn-y2k tutorial-tab-btn ${activeTab === 'tab-rules' ? 'btn-amber active' : 'btn-carbon'}`}
-          onClick={() => switchTab('tab-rules')}
-        >
-          ⚡ 6. กฎเหล็ก & เกณฑ์ประเมิน
-        </button>
-      </div>
-
-      {/* TAB 1: FLOWCHART SYMBOLS */}
-      {activeTab === 'tab-flowchart' && (
-        <>
-          <div
-            style={{
-              background: 'rgba(236,171,55,0.15)',
-              border: '2px dashed #ecab37',
-              padding: '12px 16px',
-              borderRadius: '12px',
-              marginBottom: '16px',
-              fontSize: '13px',
-              color: '#6b4400',
-              fontWeight: '600'
-            }}
-          >
-            🏡 <strong>พี่วิทยาการคำนวณบอกน้องๆ:</strong> สัญลักษณ์ Flowchart เปรียบเสมือน <strong>"ป้ายจราจรบอกทางชีวิตประจำวัน"</strong> ช่วยให้เราวางแผนการทำงานและแก้ปัญหาได้อย่างเป็นขั้นตอน!
+        {/* LEFT SIDEBAR: Topic List */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#475569', marginBottom: '4px', paddingLeft: '4px' }}>
+            📋 บทเรียนตามลำดับ:
           </div>
-
-          <div className="symbol-grid">
-            <div className="symbol-card" style={{ borderTop: '4px solid #ecab37' }}>
-              <div className="symbol-svg-wrapper">
-                <svg viewBox="0 0 120 60" style={{ width: '100px', height: '50px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>
-                  <rect x="5" y="5" width="110" height="50" rx="25" fill="#ecab37" stroke="#ffffff" strokeWidth="4" />
-                  <text x="60" y="35" fill="#ffffff" fontSize="13" fontWeight="bold" textAnchor="middle">Start / Stop</text>
-                </svg>
-              </div>
-              <h4 className="symbol-title">จุดเริ่มต้น / จุดสิ้นสุด (Terminal) 🏁</h4>
-              <p className="symbol-detail"><strong>รูปทรง:</strong> วงรี / สี่เหลี่ยมขอบมน (Oval)</p>
-              <p className="symbol-detail"><strong>หน้าที่:</strong> จุดเริ่มต้นออกตัว หรือ จุดสิ้นสุดผังงาน</p>
-              <div className="symbol-example-box">💡 <strong>ตัวอย่างชีวิตจริง:</strong> จุดเริ่ม "ตื่นนอน 6 โมงเช้า" หรือ "เข้านอน"</div>
-            </div>
-
-            <div className="symbol-card" style={{ borderTop: '4px solid #3d4f97' }}>
-              <div className="symbol-svg-wrapper">
-                <svg viewBox="0 0 120 60" style={{ width: '100px', height: '50px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>
-                  <rect x="5" y="5" width="110" height="50" rx="6" fill="#3d4f97" stroke="#ffffff" strokeWidth="4" />
-                  <text x="60" y="35" fill="#ffffff" fontSize="13" fontWeight="bold" textAnchor="middle">Process</text>
-                </svg>
-              </div>
-              <h4 className="symbol-title">การปฏิบัติงาน (Process) ⚙️</h4>
-              <p className="symbol-detail"><strong>รูปทรง:</strong> สี่เหลี่ยมผืนผ้า (Rectangle)</p>
-              <p className="symbol-detail"><strong>หน้าที่:</strong> ขั้นตอนการลงมือทำ การคำนวณ หรือการแปรรูป</p>
-              <div className="symbol-example-box">💡 <strong>ตัวอย่างชีวิตจริง:</strong> "ถูสบู่ 20 วินาที" หรือ "ต้มน้ำให้เดือด"</div>
-            </div>
-
-            <div className="symbol-card" style={{ borderTop: '4px solid #f68d1f' }}>
-              <div className="symbol-svg-wrapper">
-                <svg viewBox="0 0 120 60" style={{ width: '100px', height: '50px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>
-                  <polygon points="60,2 118,30 60,58 2,30" fill="#f68d1f" stroke="#ffffff" strokeWidth="4" />
-                  <text x="60" y="35" fill="#ffffff" fontSize="12" fontWeight="bold" textAnchor="middle">Decision</text>
-                </svg>
-              </div>
-              <h4 className="symbol-title">การตัดสินใจ (Decision) ❓</h4>
-              <p className="symbol-detail"><strong>รูปทรง:</strong> สี่เหลี่ยมข้าวหลามตัด (Diamond)</p>
-              <p className="symbol-detail"><strong>หน้าที่:</strong> จุดแยกตัดสินใจ เช็กเงื่อนไข (ใช่ / ไม่ใช่)</p>
-              <div className="symbol-example-box">💡 <strong>ตัวอย่างชีวิตจริง:</strong> "ฝนตกไหม?" ➔ ใช่: กางร่ม / ไม่ใช่: เดินต่อ</div>
-            </div>
-
-            <div className="symbol-card" style={{ borderTop: '4px solid #acace7' }}>
-              <div className="symbol-svg-wrapper">
-                <svg viewBox="0 0 120 60" style={{ width: '100px', height: '50px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>
-                  <polygon points="20,5 115,5 95,55 5,55" fill="#acace7" stroke="#ffffff" strokeWidth="4" />
-                  <text x="60" y="35" fill="#ffffff" fontSize="11" fontWeight="bold" textAnchor="middle">Manual Input</text>
-                </svg>
-              </div>
-              <h4 className="symbol-title">ป้อนข้อมูลด้วยตนเอง (Manual Input) ⌨️</h4>
-              <p className="symbol-detail"><strong>รูปทรง:</strong> สี่เหลี่ยมคางหมู (Trapezoid)</p>
-              <p className="symbol-detail"><strong>หน้าที่:</strong> รับข้อมูลผ่านคีย์บอร์ดหรือการพิมพ์มือ</p>
-              <div className="symbol-example-box">💡 <strong>ตัวอย่างชีวิตจริง:</strong> กรอกรหัส PIN ตู้ ATM หรือกดเบอร์โทรศัพท์</div>
-            </div>
-
-            <div className="symbol-card" style={{ borderTop: '4px solid #8ba1d4' }}>
-              <div className="symbol-svg-wrapper">
-                <svg viewBox="0 0 120 60" style={{ width: '100px', height: '50px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>
-                  <path d="M5 5 L95 5 C115 5 115 55 95 55 L5 55 Q25 30 5 5 Z" fill="#8ba1d4" stroke="#ffffff" strokeWidth="4" />
-                  <text x="55" y="35" fill="#ffffff" fontSize="12" fontWeight="bold" textAnchor="middle">Display</text>
-                </svg>
-              </div>
-              <h4 className="symbol-title">แสดงผลบนหน้าจอ (Display) 📺</h4>
-              <p className="symbol-detail"><strong>รูปทรง:</strong> รูปทรงจอภาพ (Display)</p>
-              <p className="symbol-detail"><strong>หน้าที่:</strong> ฉายข้อความหรือภาพให้เรามองเห็นบนจอภาพ</p>
-              <div className="symbol-example-box">💡 <strong>ตัวอย่างชีวิตจริง:</strong> หน้าจอแสดงตัวเลขอุณหภูมิ หรือ บอร์ดแสดงคะแนน</div>
-            </div>
-
-            <div className="symbol-card" style={{ borderTop: '4px solid #206479' }}>
-              <div className="symbol-svg-wrapper">
-                <svg viewBox="0 0 120 60" style={{ width: '100px', height: '50px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>
-                  <polygon points="25,5 115,5 95,55 5,55" fill="#206479" stroke="#ffffff" strokeWidth="4" />
-                  <text x="60" y="35" fill="#ffffff" fontSize="12" fontWeight="bold" textAnchor="middle">Input / Output</text>
-                </svg>
-              </div>
-              <h4 className="symbol-title">รับเข้า / ส่งออกข้อมูล (Input/Output) 📦</h4>
-              <p className="symbol-detail"><strong>รูปทรง:</strong> สี่เหลี่ยมด้านขนาน (Parallelogram)</p>
-              <p className="symbol-detail"><strong>หน้าที่:</strong> การยื่นส่งหรือรับวัตถุ/ข้อมูลทั่วไป</p>
-              <div className="symbol-example-box">💡 <strong>ตัวอย่างชีวิตจริง:</strong> ยื่นเงิน 20 บาทให้แม่ค้า ➔ รับขนมกลับมา</div>
-            </div>
-
-            <div className="symbol-card" style={{ borderTop: '4px solid #e60012' }}>
-              <div className="symbol-svg-wrapper">
-                <svg viewBox="0 0 120 60" style={{ width: '100px', height: '50px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>
-                  <circle cx="60" cy="30" r="22" fill="#e60012" stroke="#ffffff" strokeWidth="4" />
-                  <text x="60" y="35" fill="#ffffff" fontSize="11" fontWeight="bold" textAnchor="middle">Connect</text>
-                </svg>
-              </div>
-              <h4 className="symbol-title">จุดเชื่อมต่อ (Connector) 🔴</h4>
-              <p className="symbol-detail"><strong>รูปทรง:</strong> วงกลม (Circle)</p>
-              <p className="symbol-detail"><strong>หน้าที่:</strong> จุดรวมเส้นทางผังงานเหมือนจุดนัดพบ</p>
-              <div className="symbol-example-box">💡 <strong>ตัวอย่างชีวิตจริง:</strong> จุดรวมทางเดินของนักเรียนหลังเข้าแถวเคารพธงชาติ</div>
-            </div>
-
-            <div className="symbol-card" style={{ borderTop: '4px solid #21242e' }}>
-              <div className="symbol-svg-wrapper">
-                <svg viewBox="0 0 120 60" style={{ width: '100px', height: '50px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>
-                  <path d="M10 30 L90 30 M75 15 L95 30 L75 45" fill="none" stroke="#21242e" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <h4 className="symbol-title">เส้นทิศทาง (Flow Line) ➡️</h4>
-              <p className="symbol-detail"><strong>รูปทรง:</strong> เส้นตรงมีหัวลูกศร (Arrow Line)</p>
-              <p className="symbol-detail"><strong>หน้าที่:</strong> ชี้บอกทิศทางการทำงานไปยังขั้นตอนถัดไป</p>
-              <div className="symbol-example-box">💡 <strong>ตัวอย่างชีวิตจริง:</strong> ป้ายลูกศรบอกทางเดินขึ้นอาคารเรียน</div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* TAB 2: COMPUTATIONAL THINKING */}
-      {activeTab === 'tab-thinking' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div
-            style={{
-              background: 'rgba(61,79,151,0.12)',
-              border: '2px dashed #3d4f97',
-              padding: '12px 16px',
-              borderRadius: '12px',
-              fontSize: '13px',
-              color: '#1e2c60',
-              fontWeight: '600'
-            }}
-          >
-            🧠 <strong>"การคิดเชิงคำนวณ" (Computational Thinking)</strong> คือ 4 หัวใจสำคัญในการแก้ปัญหาชีวิตประจำวัน ไม่ว่าจะเป็นเรื่องเรียน งานบ้าน หรือการเล่นเกม!
-          </div>
-
-          <div className="content-card" style={{ borderLeft: '6px solid #3d4f97' }}>
-            <h3 style={{ color: '#0f172a', fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>
-              1. การย่อยปัญหา (Decomposition) 🧩
-            </h3>
-            <p style={{ fontSize: '13px', color: '#334155', lineHeight: 1.5 }}>
-              คือการ <strong>"แตกปัญหาใหญ่เป็นชิ้นเล็กๆ"</strong> เพื่อให้จัดการและทำทีละขั้นตอนได้ง่ายขึ้น ไม่ซับซ้อน
-            </p>
-            <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1e40af', padding: '10px 12px', borderRadius: '8px', marginTop: '10px', fontSize: '12px', fontWeight: 600 }}>
-              💡 <strong>ตัวอย่าง:</strong> การจัดห้องนอน ➔ ย่อยงานออกเป็น 1. เก็บหมอน 2. พับผ้าห่ม 3. กวาดขยะ 4. ถูพื้น
-            </div>
-          </div>
-
-          <div className="content-card" style={{ borderLeft: '6px solid #f68d1f' }}>
-            <h3 style={{ color: '#0f172a', fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>
-              2. การตามล่าหารูปแบบ (Pattern Recognition) 🔍
-            </h3>
-            <p style={{ fontSize: '13px', color: '#334155', lineHeight: 1.5 }}>
-              คือการ <strong>"สังเกตสิ่งที่เกิดขึ้นซ้ำๆ หรือคล้ายๆ กัน"</strong> เพื่อนำวิธีการที่เคยใช้ได้ผลมาประยุกต์ใช้ใหม่โดยไม่ต้องเริ่มคิดใหม่ทั้งหมด!
-            </p>
-            <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', color: '#9a3412', padding: '10px 12px', borderRadius: '8px', marginTop: '10px', fontSize: '12px', fontWeight: 600 }}>
-              💡 <strong>ตัวอย่าง:</strong> การทอดไข่เจียว ➔ สังเกตว่าขั้นตอนเหมือนกันทุกครั้งคือ "ตอกไข่ ➔ ใส่ซีอิ๊ว ➔ เจียวไข่ ➔ เทลงกระทะ"
-            </div>
-          </div>
-
-          <div className="content-card" style={{ borderLeft: '6px solid #e60012' }}>
-            <h3 style={{ color: '#0f172a', fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>
-              3. การคัดแยกสาระสำคัญ (Abstraction) 💡
-            </h3>
-            <p style={{ fontSize: '13px', color: '#334155', lineHeight: 1.5 }}>
-              คือการ <strong>"มองหาเฉพาะสิ่งที่จำเป็น ละทิ้งรายละเอียดจิปาถะที่ไม่เกี่ยวข้องออกไป"</strong>
-            </p>
-            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '10px 12px', borderRadius: '8px', marginTop: '10px', fontSize: '12px', fontWeight: 600 }}>
-              💡 <strong>ตัวอย่าง:</strong> การวาดแผนที่บอกทางเพื่อน ➔ วาดเฉพาะถนนหลักกับร้านสะดวกซื้อ ไม่ต้องวาดก้อนเมฆหรือสุนัขริมถนน!
-            </div>
-          </div>
-
-          <div className="content-card" style={{ borderLeft: '6px solid #206479' }}>
-            <h3 style={{ color: '#0f172a', fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>
-              4. การแต่งสูตรบอกขั้นตอน (Algorithm Design) 📝
-            </h3>
-            <p style={{ fontSize: '13px', color: '#334155', lineHeight: 1.5 }}>
-              คือการ <strong>"เขียนสั่งงานเป็นข้อๆ ลำดับ 1, 2, 3"</strong> ให้คนอื่นหรือคอมพิวเตอร์ทำตามได้อย่างถูกต้องแม่นยำ
-            </p>
-            <div style={{ background: '#ecfeff', border: '1px solid #a5f3fc', color: '#155e75', padding: '10px 12px', borderRadius: '8px', marginTop: '10px', fontSize: '12px', fontWeight: 600 }}>
-              💡 <strong>ตัวอย่าง:</strong> เขียนสูตรชงนม หรือขั้นตอนการพับกล่องกระดาษให้เพื่อนทำตามได้ทันที
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 3: CURRICULUM CONTENT BY GRADE LEVEL */}
-      {activeTab === 'tab-curriculum' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {/* ALL GRADES SUMMARY */}
-          {(gradeFilter === 'all') && (
-            <div className="content-card" style={{ borderTop: '5px solid var(--primary)', background: '#ffffff' }}>
-              <h3 style={{ color: '#0f172a', fontSize: '17px', fontWeight: 700, marginBottom: '10px' }}>
-                📘 สรุปตารางเปรียบเทียบความก้าวหน้าหลักสูตร (ป.4 vs ป.5 vs ม.1)
-              </h3>
-              <div className="admin-table-wrapper">
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>หัวข้อหลัก</th>
-                      <th>ขอบเขตเนื้อหาชั้น ป.4</th>
-                      <th>ขอบเขตเนื้อหาชั้น ป.5 (การต่อยอด)</th>
-                      <th>ขอบเขตเนื้อหาชั้น ม.1 (ต่อยอดมัธยม)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong>การใช้เหตุผลเชิงตรรกะ</strong></td>
-                      <td>คาดการณ์ผลลัพธ์จากปัญหาอย่างง่าย (เช่น เกม OX)</td>
-                      <td>แก้ปัญหาที่มีสถานะเริ่มต้นซับซ้อนและเงื่อนไขมาก (เช่น Sudoku)</td>
-                      <td>ออกแบบอัลกอริทึมแก้ปัญหาเชิงคณิตศาสตร์และชีวิตจริง</td>
-                    </tr>
-                    <tr>
-                      <td><strong>การเขียนโปรแกรม</strong></td>
-                      <td>เขียนโปรแกรมสร้างนิทาน/เรื่องราว และฝึก Debugging</td>
-                      <td>ออกแบบด้วย <strong>ผังงาน (Flowchart)</strong> และใช้เงื่อนไข (If-Else)</td>
-                      <td>แปลง Flowchart สู่โปรแกรมภาษา Scratch / Python และวนซ้ำ Loop</td>
-                    </tr>
-                    <tr>
-                      <td><strong>การสืบค้นข้อมูล</strong></td>
-                      <td>ใช้คำค้นที่ตรงประเด็นและดูโดเมน (.go.th, .ac.th)</td>
-                      <td>ประเมินความสมบูรณ์ และเปรียบเทียบ <strong>ข้อดี-ข้อเสีย</strong> จากหลายแหล่ง</td>
-                      <td>สืบค้น ประเมินความน่าเชื่อถือ สังเคราะห์ข้อมูลเพื่อการตัดสินใจ</td>
-                    </tr>
-                    <tr>
-                      <td><strong>ความปลอดภัยดิจิทัล</strong></td>
-                      <td>เน้นการปกป้องรหัสผ่านและสิทธิหน้าที่ส่วนบุคคล</td>
-                      <td>เน้นการรู้เท่าทันอาชญากรรมออนไลน์ และ Fake News</td>
-                      <td>การเป็นพลเมืองดิจิทัล รู้เท่าทันภัยไซเบอร์ ลิขสิทธิ์ และ PDPA</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* PRIMARY 4 CONTENT */}
-          {(gradeFilter === 'all' || gradeFilter === 'p4') && (
-            <div className="content-card" style={{ borderLeft: '6px solid var(--amber)', background: '#ffffff' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <h3 style={{ color: '#1e293b', fontSize: '16px', fontWeight: 700 }}>
-                  🏫 สาระเนื้อหาและ 4 หน่วยการเรียนรู้ สำหรับชั้นประถมศึกษาปีที่ 4 (ป.4)
-                </h3>
-                <span className="status-badge ready" style={{ fontSize: '11px' }}>ระดับชั้น ป.4</span>
-              </div>
-              <p style={{ fontSize: '13px', color: '#475569', marginBottom: '12px' }}>
-                เน้นการใช้เหตุผลเชิงตรรกะในการคาดการณ์ผลลัพธ์ปัญหาอย่างง่าย และฝึกสืบค้นข้อมูลอย่างมีประเด็น
-              </p>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div style={{ background: '#fffbe6', padding: '12px', borderRadius: '8px', border: '1px solid #ffe58f' }}>
-                  <h5 style={{ fontWeight: 'bold', color: '#d46b08', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 1: ขั้นตอนวิธีกับการแก้ปัญหา (Algorithms & Logic)</h5>
-                  <p style={{ fontSize: '12px', color: '#595959' }}>• การลำดับขั้นตอนชีวิตประจำวัน (แปรงฟัน, ถูบ้าน)<br />• เกมลำดับคำสั่งและเกม OX เชิงตรรกะ</p>
+          {topics.map((topic, idx) => {
+            const isUnlocked = idx === 0 || confirmedIds.includes(topics[idx - 1]?.id);
+            const isConfirmed = confirmedIds.includes(topic.id);
+            const isCurrent = idx === currentIdx;
+            return (
+              <button
+                key={topic.id}
+                onClick={() => handleSelectTopic(idx)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '10px 12px',
+                  borderRadius: '10px',
+                  border: isCurrent ? `2px solid ${topic.color}` : '2px solid #e2e8f0',
+                  background: isCurrent ? `${topic.color}18` : isConfirmed ? '#f0fdf4' : isUnlocked ? '#ffffff' : '#f8fafc',
+                  cursor: isUnlocked ? 'pointer' : 'not-allowed',
+                  textAlign: 'left',
+                  transition: 'all 0.2s',
+                  opacity: isUnlocked ? 1 : 0.5
+                }}
+              >
+                <span style={{ fontSize: '20px' }}>{isConfirmed ? '✅' : isUnlocked ? topic.emoji : '🔒'}</span>
+                <div>
+                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: isCurrent ? topic.color : '#1e293b' }}>
+                    บทที่ {idx + 1}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#64748b', lineHeight: 1.3, marginTop: '1px' }}>
+                    {topic.title.length > 28 ? topic.title.substring(0, 28) + '…' : topic.title}
+                  </div>
                 </div>
-                <div style={{ background: '#fffbe6', padding: '12px', borderRadius: '8px', border: '1px solid #ffe58f' }}>
-                  <h5 style={{ fontWeight: 'bold', color: '#d46b08', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 2: เริ่มต้นสนุกลูกบอลกับ Scratch</h5>
-                  <p style={{ fontSize: '12px', color: '#595959' }}>• บล็อกคำสั่ง Event, Motion, Looks<br />• การสร้างนิทานตอบโต้และฝึก Debugging หาข้อผิดพลาด</p>
-                </div>
-                <div style={{ background: '#fffbe6', padding: '12px', borderRadius: '8px', border: '1px solid #ffe58f' }}>
-                  <h5 style={{ fontWeight: 'bold', color: '#d46b08', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 3: นักสืบอินเทอร์เน็ตและซอฟต์แวร์สารสนเทศ</h5>
-                  <p style={{ fontSize: '12px', color: '#595959' }}>• การใช้ Keyword ค้นหาตรงประเด็น<br />• ตรวจเช็กเว็บไซต์น่าเชื่อถือ (.go.th, .ac.th) และทำ Spreadsheet</p>
-                </div>
-                <div style={{ background: '#fffbe6', padding: '12px', borderRadius: '8px', border: '1px solid #ffe58f' }}>
-                  <h5 style={{ fontWeight: 'bold', color: '#d46b08', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 4: พลเมืองดิจิทัลรุ่นเยาว์ (Digital Citizen)</h5>
-                  <p style={{ fontSize: '12px', color: '#595959' }}>• การตั้งรหัสผ่านปลอดภัย ไม่บอกใคร<br />• สิทธิ หน้าที่ และมารยาทการสื่อสารออนไลน์</p>
-                </div>
-              </div>
-            </div>
-          )}
+              </button>
+            );
+          })}
 
-          {/* PRIMARY 5 CONTENT */}
-          {(gradeFilter === 'all' || gradeFilter === 'p5') && (
-            <div className="content-card" style={{ borderLeft: '6px solid var(--systems-teal)', background: '#ffffff' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <h3 style={{ color: '#1e293b', fontSize: '16px', fontWeight: 700 }}>
-                  🏫 สาระเนื้อหาและ 4 หน่วยการเรียนรู้ สำหรับชั้นประถมศึกษาปีที่ 5 (ป.5)
-                </h3>
-                <span className="status-badge passed" style={{ fontSize: '11px' }}>ระดับชั้น ป.5</span>
-              </div>
-              <p style={{ fontSize: '13px', color: '#475569', marginBottom: '12px' }}>
-                เน้นการสร้างผังงาน (Flowchart) ออกแบบความคิดเชิงเงื่อนไข (If-Else) และประเมินข้อดีข้อเสียของข้อมูล
-              </p>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div style={{ background: '#e6fffb', padding: '12px', borderRadius: '8px', border: '1px solid #87e8de' }}>
-                  <h5 style={{ fontWeight: 'bold', color: '#08979c', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 1: ตรรกะและเงื่อนไขในการแก้ปัญหา</h5>
-                  <p style={{ fontSize: '12px', color: '#595959' }}>• แก้ปัญหาด้วย Logic Games (Sudoku, ถอดรหัส)<br />• จัดการสถานะเริ่มต้นที่หลากหลายและมีเงื่อนไข</p>
-                </div>
-                <div style={{ background: '#e6fffb', padding: '12px', borderRadius: '8px', border: '1px solid #87e8de' }}>
-                  <h5 style={{ fontWeight: 'bold', color: '#08979c', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 2: การออกแบบและพัฒนาด้วยผังงาน (Flowchart & Coding)</h5>
-                  <p style={{ fontSize: '12px', color: '#595959' }}>• สัญลักษณ์มาตรฐานผังงาน 8 สัญลักษณ์<br />• แปลง Flowchart สู่การโค้ดด้วยเงื่อนไข If-Else และ Loop</p>
-                </div>
-                <div style={{ background: '#e6fffb', padding: '12px', borderRadius: '8px', border: '1px solid #87e8de' }}>
-                  <h5 style={{ fontWeight: 'bold', color: '#08979c', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 3: สารสนเทศทรงคุณค่าและการประเมินความน่าเชื่อถือ</h5>
-                  <p style={{ fontSize: '12px', color: '#595959' }}>• เปรียบเทียบข้อมูลจากหลายแหล่งข่าว<br />• ประเมินข้อดี-ข้อเสีย สังเคราะห์ข้อมูลเพื่อการตัดสินใจ</p>
-                </div>
-                <div style={{ background: '#e6fffb', padding: '12px', borderRadius: '8px', border: '1px solid #87e8de' }}>
-                  <h5 style={{ fontWeight: 'bold', color: '#08979c', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 4: ปลอดภัยจากอาชญากรรมไซเบอร์</h5>
-                  <p style={{ fontSize: '12px', color: '#595959' }}>• รู้เท่าทันการกลั่นแกล้งออนไลน์ (Cyberbullying)<br />• ตรวจสอบข่าวปลอม (Fake News) และการทำงานกลุ่มออนไลน์</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* SECONDARY 1 CONTENT */}
-          {(gradeFilter === 'all' || gradeFilter === 'm1') && (
-            <div className="content-card" style={{ borderLeft: '6px solid var(--chrome-indigo)', background: '#ffffff' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <h3 style={{ color: '#1e293b', fontSize: '16px', fontWeight: 700 }}>
-                  🏫 สาระเนื้อหาและหน่วยการเรียนรู้ สำหรับชั้นมัธยมศึกษาปีที่ 1 (ม.1)
-                </h3>
-                <span className="status-badge" style={{ background: '#3d4f97', color: '#fff', fontSize: '11px' }}>ระดับชั้น ม.1</span>
-              </div>
-              <p style={{ fontSize: '13px', color: '#475569', marginBottom: '12px' }}>
-                ยกระดับสู่การออกแบบอัลกอริทึมขั้นสูง การวิเคราะห์ปัญหาทางคณิตศาสตร์ และระบบอัตโนมัติในชีวิตจริง
-              </p>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div style={{ background: '#f0f5ff', padding: '12px', borderRadius: '8px', border: '1px solid #adc6ff' }}>
-                  <h5 style={{ fontWeight: 'bold', color: '#1d39c4', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 1: แนวคิดเชิงคำนวณกับการแก้ปัญหาเชิงระบบ</h5>
-                  <p style={{ fontSize: '12px', color: '#595959' }}>• การวิเคราะห์องค์ประกอบ Abstraction & Algorithm<br />• การออกแบบเส้นทางการทำงานเชิงคณิตศาสตร์</p>
-                </div>
-                <div style={{ background: '#f0f5ff', padding: '12px', borderRadius: '8px', border: '1px solid #adc6ff' }}>
-                  <h5 style={{ fontWeight: 'bold', color: '#1d39c4', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 2: ผังงานขั้นสูงและโครงสร้างควบคุมซับซ้อน</h5>
-                  <p style={{ fontSize: '12px', color: '#595959' }}>• การสร้าง Flowchart แบบ Nested Condition (เงื่อนไขซ้อน)<br />• การเขียนโปรแกรมตรวจจับข้อมูลและระบบอัตโนมัติ</p>
-                </div>
-              </div>
+          {allDone && (
+            <div style={{ marginTop: '12px', background: 'linear-gradient(135deg, #065f46, #047857)', borderRadius: '10px', padding: '12px', textAlign: 'center' }}>
+              <div style={{ fontSize: '20px', marginBottom: '4px' }}>🎉</div>
+              <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#a7f3d0' }}>ครบทุกบทแล้ว!</div>
+              <div style={{ fontSize: '11px', color: '#6ee7b7', marginTop: '2px' }}>พร้อมเล่นด่านเกมส์</div>
+              <button className="btn-y2k btn-signal btn-sm" style={{ marginTop: '8px', width: '100%' }} onClick={onGoToMap}>
+                🎮 เล่นเกม
+              </button>
             </div>
           )}
         </div>
-      )}
 
-      {/* TAB 4: CYBER SAFETY */}
-      {activeTab === 'tab-safety' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div className="content-card" style={{ borderLeft: '6px solid #206479' }}>
-            <h3 style={{ color: '#0f172a', fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>
-              🛡️ การตั้งรหัสผ่านและการรักษาข้อมูลส่วนตัว (Password Security)
-            </h3>
-            <p style={{ fontSize: '13px', color: '#334155', lineHeight: 1.5 }}>
-              • รหัสผ่านที่ดีควรจดจำง่ายสำหรับเรา แต่เดายากสำหรับคนอื่น ไม่ใช้ตัวเลขเรียงกัน เช่น 1234 หรือวันเกิด
-              <br />
-              • ห้ามบอกรหัสผ่านแก่เพื่อนหรือผู้อื่นเด็ดขาด ยกเว้นพ่อแม่หรือครูประจำชั้น
-            </p>
-          </div>
-
-          <div className="content-card" style={{ borderLeft: '6px solid #e60012' }}>
-            <h3 style={{ color: '#0f172a', fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>
-              ⚠️ การรู้เท่าทันข่าวปลอมและการกลั่นแกล้งออนไลน์ (Fake News & Cyberbullying)
-            </h3>
-            <p style={{ fontSize: '13px', color: '#334155', lineHeight: 1.5 }}>
-              • สังเกตเว็บไซต์น่าเชื่อถือ เช่น ลงท้ายด้วย <strong>.go.th</strong> (หน่วยงานรัฐ) หรือ <strong>.ac.th</strong> (สถาบันการศึกษา)
-              <br />
-              • ไม่ส่งต่อข้อความกลั่นแกล้ง หรือข้อความสร้างความเกลียดชังออนไลน์
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 5: REAL FLOWCHART DIAGRAMS */}
-      {activeTab === 'tab-real-flowchart' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
-          <div className="content-card" style={{ width: '100%', borderTop: '5px solid var(--signal)', background: '#ffffff', borderRadius: '14px', padding: '20px' }}>
-            <h3 style={{ color: '#0f172a', fontSize: '18px', fontWeight: 700, textAlign: 'center', marginBottom: '8px' }}>
-              💳 ผังงานแบบจริงที่ 1: ระบบตรวจสอบการถอนเงินตู้ ATM (พร้อมเงื่อนไข ใช่ / ไม่ใช่)
-            </h3>
-            <p style={{ fontSize: '13px', textAlign: 'center', color: '#64748b', marginBottom: '14px' }}>
-              ตัวอย่างผังงานมาตรฐานที่มีจุดเริ่มต้น การป้อนรหัสคีย์บอร์ด การตัดสินใจ และทางแยก
-            </p>
-
-            <div style={{ display: 'flex', justifyContent: 'center', overflowX: 'auto', padding: '14px', background: '#f8fafc', borderRadius: '10px', border: '1.5px solid #e2e8f0' }}>
-              <svg viewBox="0 0 550 710" style={{ maxWidth: '520px', width: '100%', height: 'auto', fontFamily: 'Sarabun, sans-serif' }}>
-                <defs>
-                  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-                    <polygon points="0 0, 8 4, 0 8" fill="#1e293b" />
-                  </marker>
-                  <marker id="arrowhead-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-                    <polygon points="0 0, 8 4, 0 8" fill="#e60012" />
-                  </marker>
-                  <marker id="arrowhead-green" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-                    <polygon points="0 0, 8 4, 0 8" fill="#15803d" />
-                  </marker>
-                </defs>
-                <g>
-                  <rect x="200" y="20" width="150" height="50" rx="25" fill="#ecab37" stroke="#ffffff" strokeWidth="3" />
-                  <text x="275" y="52" fill="#ffffff" fontSize="16" fontWeight="bold" textAnchor="middle">เริ่มต้น (Start)</text>
-                </g>
-                <line x1="275" y1="70" x2="275" y2="114" stroke="#1e293b" strokeWidth="3" markerEnd="url(#arrowhead)" />
-                <g>
-                  <polygon points="200,120 350,120 325,170 175,170" fill="#acace7" stroke="#ffffff" strokeWidth="3" />
-                  <text x="262" y="150" fill="#ffffff" fontSize="14" fontWeight="bold" textAnchor="middle">เสียบบัตร & กรอกรหัส PIN</text>
-                </g>
-                <line x1="262" y1="170" x2="262" y2="219" stroke="#1e293b" strokeWidth="3" markerEnd="url(#arrowhead)" />
-                <g>
-                  <polygon points="262,225 375,280 262,335 149,280" fill="#f68d1f" stroke="#ffffff" strokeWidth="3" />
-                  <text x="262" y="275" fill="#ffffff" fontSize="14" fontWeight="bold" textAnchor="middle">รหัสถูกต้อง</text>
-                  <text x="262" y="295" fill="#ffffff" fontSize="14" fontWeight="bold" textAnchor="middle">หรือไม่?</text>
-                </g>
-                <line x1="149" y1="280" x2="75" y2="280" stroke="#e60012" strokeWidth="3" />
-                <text x="110" y="268" fill="#e60012" fontSize="14" fontWeight="bold" textAnchor="middle">ไม่ใช่</text>
-                <line x1="75" y1="280" x2="75" y2="145" stroke="#e60012" strokeWidth="3" />
-                <line x1="75" y1="145" x2="188" y2="145" stroke="#e60012" strokeWidth="3" markerEnd="url(#arrowhead-red)" />
-                <line x1="262" y1="335" x2="262" y2="384" stroke="#15803d" strokeWidth="3" markerEnd="url(#arrowhead-green)" />
-                <text x="285" y="365" fill="#15803d" fontSize="14" fontWeight="bold">ใช่</text>
-                <g>
-                  <rect x="180" y="390" width="165" height="55" rx="8" fill="#3d4f97" stroke="#ffffff" strokeWidth="3" />
-                  <text x="262" y="423" fill="#ffffff" fontSize="15" fontWeight="bold" textAnchor="middle">หักยอดเงินในบัญชี</text>
-                </g>
-                <line x1="262" y1="445" x2="262" y2="494" stroke="#1e293b" strokeWidth="3" markerEnd="url(#arrowhead)" />
-                <g>
-                  <path d="M170 500 L335 500 C365 500 365 550 335 550 L170 550 Q195 525 170 500 Z" fill="#8ba1d4" stroke="#ffffff" strokeWidth="3" />
-                  <text x="265" y="530" fill="#ffffff" fontSize="14" fontWeight="bold" textAnchor="middle">จ่ายเงินสด & พิมพ์สลิป</text>
-                </g>
-                <line x1="262" y1="550" x2="262" y2="599" stroke="#1e293b" strokeWidth="3" markerEnd="url(#arrowhead)" />
-                <g>
-                  <rect x="187" y="605" width="150" height="50" rx="25" fill="#ecab37" stroke="#ffffff" strokeWidth="3" />
-                  <text x="262" y="637" fill="#ffffff" fontSize="16" fontWeight="bold" textAnchor="middle">สิ้นสุด (Stop)</text>
-                </g>
-              </svg>
+        {/* RIGHT: Content Area */}
+        <div>
+          {/* Topic Header */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            background: `linear-gradient(135deg, ${currentTopic.color}22, ${currentTopic.color}08)`,
+            border: `2px solid ${currentTopic.color}44`,
+            borderRadius: '12px',
+            padding: '14px 16px',
+            marginBottom: '16px'
+          }}>
+            <span style={{ fontSize: '32px' }}>{currentTopic.emoji}</span>
+            <div>
+              <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>บทที่ {currentIdx + 1} จาก {topics.length}</div>
+              <h3 style={{ fontSize: '17px', fontWeight: 'bold', color: '#0f172a', margin: '2px 0 0 0' }}>{currentTopic.title}</h3>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* TAB 6: RULES & RUBRICS */}
-      {activeTab === 'tab-rules' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div className="content-card" style={{ borderLeft: '6px solid #e60012' }}>
-            <h3 style={{ color: '#0f172a', fontSize: '16px', fontWeight: 700, marginBottom: '8px' }}>
-              ⚡ 5 กฎเหล็กการเขียนผังงาน (Flowchart Rules)
-            </h3>
-            <ol style={{ paddingLeft: '20px', fontSize: '13px', color: '#334155', lineHeight: 1.6 }}>
-              <li><strong>1. จุดเริ่มต้นและสิ้นสุด:</strong> ต้องมีอย่างละ 1 จุดเท่านั้น (Terminal Start/Stop)</li>
-              <li><strong>2. ทิศทางการไหล:</strong> ไหลจาก บนลงล่าง (Top to Bottom) หรือ ซ้ายไปขวา (Left to Right)</li>
-              <li><strong>3. การตัดสินใจ (Decision):</strong> ต้องมีทางออก 2 ทางเสมอคือ "ใช่" และ "ไม่ใช่"</li>
-              <li><strong>4. ข้อความกระชับ:</strong> ใช้ประโยคกริยาสั้นๆ เช่น "ถูสบู่ 20 วินาที", "ตรวจรหัสผ่าน"</li>
-              <li><strong>5. เลี่ยงเส้นตัดกัน:</strong> ใช้สัญลักษณ์วงกลม จุดเชื่อมต่อ (Connector) รวมเส้นทาง</li>
-            </ol>
+          {/* Content Sections */}
+          <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '6px', marginBottom: '14px' }}>
+            {currentTopic.sections.map((section, idx) => renderSection(section, idx))}
           </div>
 
-          <div className="content-card" style={{ borderTop: '5px solid var(--amber)', background: '#ffffff' }}>
-            <h3 style={{ color: '#0f172a', fontSize: '16px', fontWeight: 700, marginBottom: '10px' }}>
-              📋 เกณฑ์การประเมินผลการเรียนรู้ (Rubric Assessment Criteria)
-            </h3>
-            <div className="admin-table-wrapper">
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>ประเด็นการประเมิน</th>
-                    <th>ดีมาก (4)</th>
-                    <th>ดี (3)</th>
-                    <th>ผ่านเกณฑ์ (2)</th>
-                    <th>ปรับปรุง (1)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><strong>ความถูกต้องของสัญลักษณ์</strong></td>
-                    <td>เลือกสัญลักษณ์ถูกต้องตามมาตรฐานทุกจุด</td>
-                    <td>ผิดพลาด 1 จุด</td>
-                    <td>ผิดพลาด 2-3 จุด</td>
-                    <td>ใช้สัญลักษณ์ไม่ถูกต้องเกิน 3 จุด</td>
-                  </tr>
-                  <tr>
-                    <td><strong>ทิศทางลำดับ (Flow Line)</strong></td>
-                    <td>ลูกศรเชื่อมโยงถูกต้อง มีจุดเริ่มและจบชัดเจน</td>
-                    <td>ทิศทางถูกต้อง ขาดจุดเริ่มหรือจบ 1 จุด</td>
-                    <td>ทิศทางลูกศรสับสนบางจุด</td>
-                    <td>ลูกศรไม่เชื่อมโยง ขาดทิศทางชัดเจน</td>
-                  </tr>
-                  <tr>
-                    <td><strong>การใช้เงื่อนไข (Decision)</strong></td>
-                    <td>เงื่อนไขชัดเจน ครบถ้วนทุกกรณี (Yes/No)</td>
-                    <td>เงื่อนไขชัดเจน ขาดคำระบุผล 1 จุด</td>
-                    <td>เงื่อนไขสับสน แต่ยังพอเข้าใจแนวคิด</td>
-                    <td>เงื่อนไขไม่สมบูรณ์ นำไปประมวลผลไม่ได้</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          {/* Timer & Confirm Section */}
+          <div style={{
+            background: isCurrentConfirmed ? '#f0fdf4' : '#fffbeb',
+            border: `2px solid ${isCurrentConfirmed ? '#86efac' : '#fcd34d'}`,
+            borderRadius: '12px',
+            padding: '14px'
+          }}>
+            {isCurrentConfirmed ? (
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '22px', marginBottom: '4px' }}>✅</div>
+                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#14532d' }}>ยืนยันการเรียนรู้บทนี้แล้ว</div>
+                {canReadNext && (
+                  <button className="btn-y2k btn-signal btn-sm" style={{ marginTop: '10px' }} onClick={() => setCurrentIdx(prev => prev + 1)}>
+                    บทถัดไป ➔
+                  </button>
+                )}
+                {!canReadNext && !allDone && (
+                  <div style={{ fontSize: '12px', color: '#64748b', marginTop: '6px' }}>นี่คือบทสุดท้ายของคุณ ✨</div>
+                )}
+              </div>
+            ) : (
+              <div>
+                {/* Timer Bar */}
+                <div style={{ marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#92400e' }}>⏱️ เวลาศึกษา:</span>
+                    <span style={{ fontSize: '13px', fontWeight: 'bold', color: secondsRemaining > 0 ? '#d97706' : '#15803d' }}>
+                      {secondsRemaining > 0 ? `อีก ${secondsRemaining} วินาที` : '✅ ครบ 60 วินาทีแล้ว!'}
+                    </span>
+                  </div>
+                  <div style={{ background: '#e5e7eb', borderRadius: '999px', height: '10px', overflow: 'hidden' }}>
+                    <div style={{
+                      width: `${timerPercent}%`,
+                      height: '100%',
+                      background: timerPercent >= 100 ? '#22c55e' : '#f59e0b',
+                      borderRadius: '999px',
+                      transition: 'width 1s linear'
+                    }} />
+                  </div>
+                </div>
+
+                <button
+                  className={`btn-y2k btn-lg ${timeOnTopic >= 60 ? 'btn-signal' : 'btn-carbon'}`}
+                  onClick={handleConfirm}
+                  disabled={timeOnTopic < 60}
+                  style={{
+                    width: '100%',
+                    opacity: timeOnTopic < 60 ? 0.5 : 1,
+                    cursor: timeOnTopic < 60 ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {timeOnTopic >= 60 ? '✅ ยืนยันการเรียนรู้บทนี้' : `📖 กำลังศึกษา... (อีก ${secondsRemaining} วินาที)`}
+                </button>
+                <p style={{ fontSize: '11px', color: '#78350f', marginTop: '6px', textAlign: 'center' }}>
+                  อ่านเนื้อหาให้ครบ 60 วินาทีแล้วกดยืนยันเพื่อไปยังบทถัดไป
+                </p>
+              </div>
+            )}
           </div>
         </div>
-      )}
-
-      {/* FOOTER ACTIONS */}
-      <div style={{ marginTop: '24px', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <button className="btn-y2k btn-signal btn-lg" onClick={onGoToMap}>
-          🎮 พร้อมแล้วไปผจญภัยเล่นเกม ➔
-        </button>
-        <button className="btn-y2k btn-amber btn-lg" onClick={onOpenCertificate}>
-          🎓 ดูประกาศนียบัตร
-        </button>
       </div>
     </section>
   );
