@@ -1,0 +1,15 @@
+# Next.js build output
+.next/
+out/
+build/
+node_modules/
+
+# Local data & environment
+.env*.local
+data/*.db
+data/*.db-journal
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+*.log

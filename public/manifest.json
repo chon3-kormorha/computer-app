@@ -1,0 +1,9 @@
+{
+  "short_name": "Flowchart Game",
+  "name": "Flowchart Game - แอปเรียนรู้ผังงานสำหรับนักเรียน (PWA)",
+  "icons": [],
+  "start_url": "/",
+  "background_color": "#21242e",
+  "theme_color": "#e60012",
+  "display": "standalone"
+}

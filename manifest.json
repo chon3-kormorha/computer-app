@@ -1,0 +1,18 @@
+{
+  "name": "Flowchart Master - เกมเรียนรู้ผังงาน",
+  "short_name": "FlowchartGame",
+  "description": "เกมเรียนรู้สัญลักษณ์และขั้นตอน Flowchart สำหรับนักเรียน",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#7a8aba",
+  "theme_color": "#21242e",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%237a8aba'/><rect x='32' y='32' width='448' height='448' rx='80' fill='%2321242e' stroke='%233d4f97' stroke-width='16'/><rect x='156' y='96' width='200' height='70' rx='35' fill='%23ecab37' stroke='%23ffffff' stroke-width='8'/><text x='256' y='142' font-family='sans-serif' font-weight='bold' font-size='32' fill='%2321242e' text-anchor='middle'>START</text><path d='M256 166 L256 226' stroke='%23f68d1f' stroke-width='16' stroke-linecap='round'/><path d='M240 216 L256 236 L272 216' fill='none' stroke='%23f68d1f' stroke-width='16'/><polygon points='256,240 370,300 256,360 142,300' fill='%239fbee7' stroke='%23ffffff' stroke-width='8'/><text x='256' y='308' font-family='sans-serif' font-weight='bold' font-size='26' fill='%2321242e' text-anchor='middle'>CHECK?</text><path d='M256 360 L256 410' stroke='%23f68d1f' stroke-width='16'/><rect x='176' y='410' width='160' height='60' rx='12' fill='%23e60012' stroke='%23ffffff' stroke-width='8'/><text x='256' y='450' font-family='sans-serif' font-weight='bold' font-size='28' fill='%23ffffff' text-anchor='middle'>END</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

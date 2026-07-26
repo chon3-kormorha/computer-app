@@ -1,0 +1,14 @@
+[
+  {
+    "key": "studentPasscode",
+    "value": "1234"
+  },
+  {
+    "key": "adminUsername",
+    "value": "admin"
+  },
+  {
+    "key": "adminPassword",
+    "value": "admin1234"
+  }
+]
