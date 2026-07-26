@@ -21,7 +21,7 @@ export default function Home() {
     studentPasscode: '1234',
     adminUsername: 'admin',
     adminPassword: 'admin1234',
-    availableGrades: ['ป.4/1', 'ป.4/2', 'ป.5/1', 'ป.5/2', 'ม.1/1', 'ม.1/2']
+    availableGrades: ['ป.4/1', 'ป.4/2', 'ป.4/3', 'ป.5/1', 'ป.5/2', 'ป.5/3', 'ป.6/1', 'ป.6/2']
   });
 
   useEffect(() => {
@@ -66,11 +66,16 @@ export default function Home() {
       completed.push(levelNum);
     }
 
+    // P4 levels: 1-10, P5 levels: 11-20. Certificate when completed 10 in any single track.
+    const p4Done = completed.filter(l => l >= 1 && l <= 10).length;
+    const p5Done = completed.filter(l => l >= 11 && l <= 20).length;
+    const earnedCert = p4Done >= 10 || p5Done >= 10;
+
     const updated = await StorageEngine.saveStudentProgress({
       score: (currentStudent?.score || 0) + score,
       stars: (currentStudent?.stars || 0) + stars,
       levelsCompleted: completed,
-      certificateIssued: completed.length >= 10
+      certificateIssued: earnedCert
     });
 
     setCurrentStudent(updated);

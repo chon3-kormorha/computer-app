@@ -7,7 +7,7 @@ export async function GET() {
     let studentPasscode = '1234';
     let adminUsername = 'admin';
     let adminPassword = 'admin1234';
-    let availableGrades = ['ป.4/1', 'ป.4/2', 'ป.5/1', 'ป.5/2', 'ม.1/1', 'ม.1/2'];
+    let availableGrades = ['ป.4/1', 'ป.4/2', 'ป.4/3', 'ป.5/1', 'ป.5/2', 'ป.5/3', 'ป.6/1', 'ป.6/2'];
 
     // 1. Try Supabase Cloud DB first
     const spConfig = await SupabaseClient.getConfig();

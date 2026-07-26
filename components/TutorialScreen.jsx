@@ -5,13 +5,13 @@ import { SoundEngine } from '../lib/audio';
 
 export default function TutorialScreen({ student, onGoToMap, onOpenCertificate }) {
   const [activeTab, setActiveTab] = useState('tab-flowchart');
-  const [gradeFilter, setGradeFilter] = useState('all'); // 'all' | 'p4' | 'p5' | 'm1'
+  const [gradeFilter, setGradeFilter] = useState('all'); // 'all' | 'p4' | 'p5' | 'p6'
 
   useEffect(() => {
     if (student && student.grade) {
       if (student.grade.startsWith('ป.4')) setGradeFilter('p4');
       else if (student.grade.startsWith('ป.5')) setGradeFilter('p5');
-      else if (student.grade.startsWith('ม.1')) setGradeFilter('m1');
+      else if (student.grade.startsWith('ป.6')) setGradeFilter('p6');
     }
   }, [student]);
 
@@ -34,7 +34,7 @@ export default function TutorialScreen({ student, onGoToMap, onOpenCertificate }
       >
         <h2 className="hero-display-title">📚 คลังความรู้วิชาวิทยาการคำนวณ</h2>
         <p style={{ fontSize: '14px', fontWeight: 'bold', marginTop: '6px', lineHeight: 1.5 }}>
-          💡 หลักสูตรสาระเทคโนโลยี (วิทยาการคำนวณ) แยกสรุปตามระดับสายชั้น ป.4, ป.5 และ ม.1
+          💡 หลักสูตรสาระเทคโนโลยี (วิทยาการคำนวณ) แยกสรุปตามระดับสายชั้น ป.4, ป.5 และ ป.6
           ตามคู่มือการจัดการเรียนรู้ สสวท. โรงเรียนบ้าน กม.ห้า
         </p>
       </div>
@@ -79,10 +79,10 @@ export default function TutorialScreen({ student, onGoToMap, onOpenCertificate }
         </button>
 
         <button
-          className={`btn-y2k btn-sm ${gradeFilter === 'm1' ? 'btn-signal' : 'btn-carbon'}`}
-          onClick={() => handleSelectGrade('m1')}
+          className={`btn-y2k btn-sm ${gradeFilter === 'p6' ? 'btn-signal' : 'btn-carbon'}`}
+          onClick={() => handleSelectGrade('p6')}
         >
-          🎒 ชั้นมัธยมศึกษาปีที่ 1
+          🎒 ชั้นประถมศึกษาปีที่ 6
         </button>
 
         {student && (
