@@ -168,6 +168,7 @@ export default function Home() {
 
         {currentScreen === 'tutorial-screen' && (
           <TutorialScreen
+            student={currentStudent}
             onGoToMap={() => showScreen('student-map-screen')}
             onOpenCertificate={() => showScreen('certificate-screen')}
           />

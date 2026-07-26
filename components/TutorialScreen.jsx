@@ -1,27 +1,95 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SoundEngine } from '../lib/audio';
 
-export default function TutorialScreen({ onGoToMap, onOpenCertificate }) {
+export default function TutorialScreen({ student, onGoToMap, onOpenCertificate }) {
   const [activeTab, setActiveTab] = useState('tab-flowchart');
+  const [gradeFilter, setGradeFilter] = useState('all'); // 'all' | 'p4' | 'p5' | 'm1'
+
+  useEffect(() => {
+    if (student && student.grade) {
+      if (student.grade.startsWith('ป.4')) setGradeFilter('p4');
+      else if (student.grade.startsWith('ป.5')) setGradeFilter('p5');
+      else if (student.grade.startsWith('ม.1')) setGradeFilter('m1');
+    }
+  }, [student]);
 
   const switchTab = (tabId) => {
     SoundEngine.playClick();
     setActiveTab(tabId);
   };
 
+  const handleSelectGrade = (g) => {
+    SoundEngine.playClick();
+    setGradeFilter(g);
+  };
+
   return (
     <section className="screen-view">
+      {/* HERO PANEL */}
       <div
         className="hero-panel"
         style={{ background: 'linear-gradient(135deg, #1b4332 0%, #2d6a4f 50%, #1e5f74 100%)', color: '#ffffff' }}
       >
-        <h2 className="hero-display-title">📚 คลังความรู้วิชาวิทยาการคำนวณ (ป.4 - ป.5)</h2>
+        <h2 className="hero-display-title">📚 คลังความรู้วิชาวิทยาการคำนวณ</h2>
         <p style={{ fontSize: '14px', fontWeight: 'bold', marginTop: '6px', lineHeight: 1.5 }}>
-          💡 หลักสูตรสาระเทคโนโลยี (วิทยาการคำนวณ) มุ่งเน้นการยกระดับขีดความสามารถให้ผู้เรียนคิดแก้ปัญหาอย่างเป็นระบบ
+          💡 หลักสูตรสาระเทคโนโลยี (วิทยาการคำนวณ) แยกสรุปตามระดับสายชั้น ป.4, ป.5 และ ม.1
           ตามคู่มือการจัดการเรียนรู้ สสวท. โรงเรียนบ้าน กม.ห้า
         </p>
+      </div>
+
+      {/* GRADE FILTER SELECTOR BAR */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          background: '#ffffff',
+          padding: '10px 16px',
+          borderRadius: '12px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+          marginBottom: '16px',
+          flexWrap: 'wrap'
+        }}
+      >
+        <span style={{ fontWeight: 'bold', fontSize: '13px', color: '#1e293b' }}>
+          🏫 สายชั้นเรียนที่เลือกดู:
+        </span>
+
+        <button
+          className={`btn-y2k btn-sm ${gradeFilter === 'all' ? 'btn-amber' : 'btn-carbon'}`}
+          onClick={() => handleSelectGrade('all')}
+        >
+          🌟 แสดงเนื้อหารวมทุกชั้น
+        </button>
+
+        <button
+          className={`btn-y2k btn-sm ${gradeFilter === 'p4' ? 'btn-signal' : 'btn-carbon'}`}
+          onClick={() => handleSelectGrade('p4')}
+        >
+          🎒 ชั้นประถมศึกษาปีที่ 4
+        </button>
+
+        <button
+          className={`btn-y2k btn-sm ${gradeFilter === 'p5' ? 'btn-signal' : 'btn-carbon'}`}
+          onClick={() => handleSelectGrade('p5')}
+        >
+          🎒 ชั้นประถมศึกษาปีที่ 5
+        </button>
+
+        <button
+          className={`btn-y2k btn-sm ${gradeFilter === 'm1' ? 'btn-signal' : 'btn-carbon'}`}
+          onClick={() => handleSelectGrade('m1')}
+        >
+          🎒 ชั้นมัธยมศึกษาปีที่ 1
+        </button>
+
+        {student && (
+          <span style={{ marginLeft: 'auto', fontSize: '12px', color: 'var(--systems-teal)', fontWeight: 'bold' }}>
+            👤 นักเรียน: {student.name} ({student.grade})
+          </span>
+        )}
       </div>
 
       {/* TUTORIAL TABS NAVIGATION */}
@@ -42,7 +110,7 @@ export default function TutorialScreen({ onGoToMap, onOpenCertificate }) {
           className={`btn-y2k tutorial-tab-btn ${activeTab === 'tab-curriculum' ? 'btn-amber active' : 'btn-carbon'}`}
           onClick={() => switchTab('tab-curriculum')}
         >
-          📘 3. สรุปเนื้อหา ป.4 & ป.5
+          📘 3. เนื้อหาหลักสูตรเฉพาะสายชั้น {gradeFilter !== 'all' ? `(${gradeFilter.toUpperCase()})` : ''}
         </button>
         <button
           className={`btn-y2k tutorial-tab-btn ${activeTab === 'tab-safety' ? 'btn-amber active' : 'btn-carbon'}`}
@@ -256,78 +324,149 @@ export default function TutorialScreen({ onGoToMap, onOpenCertificate }) {
         </div>
       )}
 
-      {/* TAB 3: CURRICULUM SUMMARY G4 & G5 */}
+      {/* TAB 3: CURRICULUM CONTENT BY GRADE LEVEL */}
       {activeTab === 'tab-curriculum' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div className="content-card" style={{ borderTop: '5px solid var(--primary)', background: '#ffffff' }}>
-            <h3 style={{ color: '#0f172a', fontSize: '17px', fontWeight: 700, marginBottom: '10px' }}>
-              📘 สรุปตารางเปรียบเทียบความก้าวหน้าหลักสูตร (ป.4 vs ป.5)
-            </h3>
-            <div className="admin-table-wrapper">
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>หัวข้อหลัก</th>
-                    <th>ขอบเขตเนื้อหาชั้น ป.4</th>
-                    <th>ขอบเขตเนื้อหาชั้น ป.5 (การต่อยอด)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><strong>การใช้เหตุผลเชิงตรรกะ</strong></td>
-                    <td>คาดการณ์ผลลัพธ์จากปัญหาอย่างง่าย (เช่น เกม OX)</td>
-                    <td>แก้ปัญหาที่มีสถานะเริ่มต้นซับซ้อนและเงื่อนไขมาก (เช่น Sudoku)</td>
-                  </tr>
-                  <tr>
-                    <td><strong>การเขียนโปรแกรม</strong></td>
-                    <td>เขียนโปรแกรมสร้างนิทาน/เรื่องราว และฝึก Debugging</td>
-                    <td>ออกแบบด้วย <strong>ผังงาน (Flowchart)</strong> และใช้เงื่อนไขครอบคลุม (If-Else)</td>
-                  </tr>
-                  <tr>
-                    <td><strong>การสืบค้นข้อมูล</strong></td>
-                    <td>ใช้คำค้นที่ตรงประเด็นและดูโดเมน (.go.th, .ac.th)</td>
-                    <td>ประเมินความสมบูรณ์ และเปรียบเทียบ <strong>ข้อดี-ข้อเสีย</strong> จากหลายแหล่ง</td>
-                  </tr>
-                  <tr>
-                    <td><strong>การจัดการข้อมูล</strong></td>
-                    <td>รวบรวมข้อมูลและประมวลผลพื้นฐาน (เช่น หาผลรวม)</td>
-                    <td>สังเคราะห์สารสนเทศจากหลายแหล่งเพื่อใช้ในการตัดสินใจ</td>
-                  </tr>
-                  <tr>
-                    <td><strong>ความปลอดภัยดิจิทัล</strong></td>
-                    <td>เน้นการปกป้องรหัสผ่านและสิทธิหน้าที่ส่วนบุคคล</td>
-                    <td>เน้นการรู้เท่าทันอาชญากรรมออนไลน์และการทำงานกลุ่มบนเครือข่าย</td>
-                  </tr>
-                </tbody>
-              </table>
+          {/* ALL GRADES SUMMARY */}
+          {(gradeFilter === 'all') && (
+            <div className="content-card" style={{ borderTop: '5px solid var(--primary)', background: '#ffffff' }}>
+              <h3 style={{ color: '#0f172a', fontSize: '17px', fontWeight: 700, marginBottom: '10px' }}>
+                📘 สรุปตารางเปรียบเทียบความก้าวหน้าหลักสูตร (ป.4 vs ป.5 vs ม.1)
+              </h3>
+              <div className="admin-table-wrapper">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>หัวข้อหลัก</th>
+                      <th>ขอบเขตเนื้อหาชั้น ป.4</th>
+                      <th>ขอบเขตเนื้อหาชั้น ป.5 (การต่อยอด)</th>
+                      <th>ขอบเขตเนื้อหาชั้น ม.1 (ต่อยอดมัธยม)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>การใช้เหตุผลเชิงตรรกะ</strong></td>
+                      <td>คาดการณ์ผลลัพธ์จากปัญหาอย่างง่าย (เช่น เกม OX)</td>
+                      <td>แก้ปัญหาที่มีสถานะเริ่มต้นซับซ้อนและเงื่อนไขมาก (เช่น Sudoku)</td>
+                      <td>ออกแบบอัลกอริทึมแก้ปัญหาเชิงคณิตศาสตร์และชีวิตจริง</td>
+                    </tr>
+                    <tr>
+                      <td><strong>การเขียนโปรแกรม</strong></td>
+                      <td>เขียนโปรแกรมสร้างนิทาน/เรื่องราว และฝึก Debugging</td>
+                      <td>ออกแบบด้วย <strong>ผังงาน (Flowchart)</strong> และใช้เงื่อนไข (If-Else)</td>
+                      <td>แปลง Flowchart สู่โปรแกรมภาษา Scratch / Python และวนซ้ำ Loop</td>
+                    </tr>
+                    <tr>
+                      <td><strong>การสืบค้นข้อมูล</strong></td>
+                      <td>ใช้คำค้นที่ตรงประเด็นและดูโดเมน (.go.th, .ac.th)</td>
+                      <td>ประเมินความสมบูรณ์ และเปรียบเทียบ <strong>ข้อดี-ข้อเสีย</strong> จากหลายแหล่ง</td>
+                      <td>สืบค้น ประเมินความน่าเชื่อถือ สังเคราะห์ข้อมูลเพื่อการตัดสินใจ</td>
+                    </tr>
+                    <tr>
+                      <td><strong>ความปลอดภัยดิจิทัล</strong></td>
+                      <td>เน้นการปกป้องรหัสผ่านและสิทธิหน้าที่ส่วนบุคคล</td>
+                      <td>เน้นการรู้เท่าทันอาชญากรรมออนไลน์ และ Fake News</td>
+                      <td>การเป็นพลเมืองดิจิทัล รู้เท่าทันภัยไซเบอร์ ลิขสิทธิ์ และ PDPA</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div className="content-card" style={{ borderLeft: '6px solid var(--amber)' }}>
-              <h4 style={{ color: '#1e293b', fontSize: '15px', fontWeight: 700, marginBottom: '8px' }}>
-                🏫 โครงสร้างหน่วยการเรียนรู้ ชั้น ป.4 (4 หน่วย)
-              </h4>
-              <ul style={{ paddingLeft: '18px', fontSize: '13px', color: '#334155', lineHeight: 1.6 }}>
-                <li><strong>หน่วยที่ 1:</strong> ขั้นตอนวิธีกับการแก้ปัญหา (Algorithms & Logic)</li>
-                <li><strong>หน่วยที่ 2:</strong> เริ่มต้นสนุกลูกบอลกับ Scratch (สร้างนิทาน & Debugging)</li>
-                <li><strong>หน่วยที่ 3:</strong> นักสืบอินเทอร์เน็ตและซอฟต์แวร์สารสนเทศ (Spreadsheet)</li>
-                <li><strong>หน่วยที่ 4:</strong> พลเมืองดิจิทัลรุ่นเยาว์ (Digital Citizen & Passcode)</li>
-              </ul>
-            </div>
+          {/* PRIMARY 4 CONTENT */}
+          {(gradeFilter === 'all' || gradeFilter === 'p4') && (
+            <div className="content-card" style={{ borderLeft: '6px solid var(--amber)', background: '#ffffff' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <h3 style={{ color: '#1e293b', fontSize: '16px', fontWeight: 700 }}>
+                  🏫 สาระเนื้อหาและ 4 หน่วยการเรียนรู้ สำหรับชั้นประถมศึกษาปีที่ 4 (ป.4)
+                </h3>
+                <span className="status-badge ready" style={{ fontSize: '11px' }}>ระดับชั้น ป.4</span>
+              </div>
+              <p style={{ fontSize: '13px', color: '#475569', marginBottom: '12px' }}>
+                เน้นการใช้เหตุผลเชิงตรรกะในการคาดการณ์ผลลัพธ์ปัญหาอย่างง่าย และฝึกสืบค้นข้อมูลอย่างมีประเด็น
+              </p>
 
-            <div className="content-card" style={{ borderLeft: '6px solid var(--systems-teal)' }}>
-              <h4 style={{ color: '#1e293b', fontSize: '15px', fontWeight: 700, marginBottom: '8px' }}>
-                🏫 โครงสร้างหน่วยการเรียนรู้ ชั้น ป.5 (4 หน่วย)
-              </h4>
-              <ul style={{ paddingLeft: '18px', fontSize: '13px', color: '#334155', lineHeight: 1.6 }}>
-                <li><strong>หน่วยที่ 1:</strong> ตรรกะและเงื่อนไขในการแก้ปัญหา (Sudoku & ถอดรหัส)</li>
-                <li><strong>หน่วยที่ 2:</strong> การออกแบบและพัฒนาด้วยผังงาน (Flowchart & Coding)</li>
-                <li><strong>หน่วยที่ 3:</strong> สารสนเทศทรงคุณค่าและการประเมินความน่าเชื่อถือ</li>
-                <li><strong>หน่วยที่ 4:</strong> ปลอดภัยจากอาชญากรรมไซเบอร์ (Fake News & Cyberbullying)</li>
-              </ul>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ background: '#fffbe6', padding: '12px', borderRadius: '8px', border: '1px solid #ffe58f' }}>
+                  <h5 style={{ fontWeight: 'bold', color: '#d46b08', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 1: ขั้นตอนวิธีกับการแก้ปัญหา (Algorithms & Logic)</h5>
+                  <p style={{ fontSize: '12px', color: '#595959' }}>• การลำดับขั้นตอนชีวิตประจำวัน (แปรงฟัน, ถูบ้าน)<br />• เกมลำดับคำสั่งและเกม OX เชิงตรรกะ</p>
+                </div>
+                <div style={{ background: '#fffbe6', padding: '12px', borderRadius: '8px', border: '1px solid #ffe58f' }}>
+                  <h5 style={{ fontWeight: 'bold', color: '#d46b08', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 2: เริ่มต้นสนุกลูกบอลกับ Scratch</h5>
+                  <p style={{ fontSize: '12px', color: '#595959' }}>• บล็อกคำสั่ง Event, Motion, Looks<br />• การสร้างนิทานตอบโต้และฝึก Debugging หาข้อผิดพลาด</p>
+                </div>
+                <div style={{ background: '#fffbe6', padding: '12px', borderRadius: '8px', border: '1px solid #ffe58f' }}>
+                  <h5 style={{ fontWeight: 'bold', color: '#d46b08', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 3: นักสืบอินเทอร์เน็ตและซอฟต์แวร์สารสนเทศ</h5>
+                  <p style={{ fontSize: '12px', color: '#595959' }}>• การใช้ Keyword ค้นหาตรงประเด็น<br />• ตรวจเช็กเว็บไซต์น่าเชื่อถือ (.go.th, .ac.th) และทำ Spreadsheet</p>
+                </div>
+                <div style={{ background: '#fffbe6', padding: '12px', borderRadius: '8px', border: '1px solid #ffe58f' }}>
+                  <h5 style={{ fontWeight: 'bold', color: '#d46b08', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 4: พลเมืองดิจิทัลรุ่นเยาว์ (Digital Citizen)</h5>
+                  <p style={{ fontSize: '12px', color: '#595959' }}>• การตั้งรหัสผ่านปลอดภัย ไม่บอกใคร<br />• สิทธิ หน้าที่ และมารยาทการสื่อสารออนไลน์</p>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* PRIMARY 5 CONTENT */}
+          {(gradeFilter === 'all' || gradeFilter === 'p5') && (
+            <div className="content-card" style={{ borderLeft: '6px solid var(--systems-teal)', background: '#ffffff' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <h3 style={{ color: '#1e293b', fontSize: '16px', fontWeight: 700 }}>
+                  🏫 สาระเนื้อหาและ 4 หน่วยการเรียนรู้ สำหรับชั้นประถมศึกษาปีที่ 5 (ป.5)
+                </h3>
+                <span className="status-badge passed" style={{ fontSize: '11px' }}>ระดับชั้น ป.5</span>
+              </div>
+              <p style={{ fontSize: '13px', color: '#475569', marginBottom: '12px' }}>
+                เน้นการสร้างผังงาน (Flowchart) ออกแบบความคิดเชิงเงื่อนไข (If-Else) และประเมินข้อดีข้อเสียของข้อมูล
+              </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ background: '#e6fffb', padding: '12px', borderRadius: '8px', border: '1px solid #87e8de' }}>
+                  <h5 style={{ fontWeight: 'bold', color: '#08979c', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 1: ตรรกะและเงื่อนไขในการแก้ปัญหา</h5>
+                  <p style={{ fontSize: '12px', color: '#595959' }}>• แก้ปัญหาด้วย Logic Games (Sudoku, ถอดรหัส)<br />• จัดการสถานะเริ่มต้นที่หลากหลายและมีเงื่อนไข</p>
+                </div>
+                <div style={{ background: '#e6fffb', padding: '12px', borderRadius: '8px', border: '1px solid #87e8de' }}>
+                  <h5 style={{ fontWeight: 'bold', color: '#08979c', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 2: การออกแบบและพัฒนาด้วยผังงาน (Flowchart & Coding)</h5>
+                  <p style={{ fontSize: '12px', color: '#595959' }}>• สัญลักษณ์มาตรฐานผังงาน 8 สัญลักษณ์<br />• แปลง Flowchart สู่การโค้ดด้วยเงื่อนไข If-Else และ Loop</p>
+                </div>
+                <div style={{ background: '#e6fffb', padding: '12px', borderRadius: '8px', border: '1px solid #87e8de' }}>
+                  <h5 style={{ fontWeight: 'bold', color: '#08979c', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 3: สารสนเทศทรงคุณค่าและการประเมินความน่าเชื่อถือ</h5>
+                  <p style={{ fontSize: '12px', color: '#595959' }}>• เปรียบเทียบข้อมูลจากหลายแหล่งข่าว<br />• ประเมินข้อดี-ข้อเสีย สังเคราะห์ข้อมูลเพื่อการตัดสินใจ</p>
+                </div>
+                <div style={{ background: '#e6fffb', padding: '12px', borderRadius: '8px', border: '1px solid #87e8de' }}>
+                  <h5 style={{ fontWeight: 'bold', color: '#08979c', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 4: ปลอดภัยจากอาชญากรรมไซเบอร์</h5>
+                  <p style={{ fontSize: '12px', color: '#595959' }}>• รู้เท่าทันการกลั่นแกล้งออนไลน์ (Cyberbullying)<br />• ตรวจสอบข่าวปลอม (Fake News) และการทำงานกลุ่มออนไลน์</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* SECONDARY 1 CONTENT */}
+          {(gradeFilter === 'all' || gradeFilter === 'm1') && (
+            <div className="content-card" style={{ borderLeft: '6px solid var(--chrome-indigo)', background: '#ffffff' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <h3 style={{ color: '#1e293b', fontSize: '16px', fontWeight: 700 }}>
+                  🏫 สาระเนื้อหาและหน่วยการเรียนรู้ สำหรับชั้นมัธยมศึกษาปีที่ 1 (ม.1)
+                </h3>
+                <span className="status-badge" style={{ background: '#3d4f97', color: '#fff', fontSize: '11px' }}>ระดับชั้น ม.1</span>
+              </div>
+              <p style={{ fontSize: '13px', color: '#475569', marginBottom: '12px' }}>
+                ยกระดับสู่การออกแบบอัลกอริทึมขั้นสูง การวิเคราะห์ปัญหาทางคณิตศาสตร์ และระบบอัตโนมัติในชีวิตจริง
+              </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ background: '#f0f5ff', padding: '12px', borderRadius: '8px', border: '1px solid #adc6ff' }}>
+                  <h5 style={{ fontWeight: 'bold', color: '#1d39c4', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 1: แนวคิดเชิงคำนวณกับการแก้ปัญหาเชิงระบบ</h5>
+                  <p style={{ fontSize: '12px', color: '#595959' }}>• การวิเคราะห์องค์ประกอบ Abstraction & Algorithm<br />• การออกแบบเส้นทางการทำงานเชิงคณิตศาสตร์</p>
+                </div>
+                <div style={{ background: '#f0f5ff', padding: '12px', borderRadius: '8px', border: '1px solid #adc6ff' }}>
+                  <h5 style={{ fontWeight: 'bold', color: '#1d39c4', fontSize: '13px', marginBottom: '4px' }}>📌 หน่วยที่ 2: ผังงานขั้นสูงและโครงสร้างควบคุมซับซ้อน</h5>
+                  <p style={{ fontSize: '12px', color: '#595959' }}>• การสร้าง Flowchart แบบ Nested Condition (เงื่อนไขซ้อน)<br />• การเขียนโปรแกรมตรวจจับข้อมูลและระบบอัตโนมัติ</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
