@@ -6,10 +6,15 @@ import { StorageEngine } from '../lib/storage';
 import { SoundEngine } from '../lib/audio';
 
 export default function AdminDashboard({ onBackToMap, onConfigChange }) {
-  const [activeTab, setActiveTab] = useState('roster'); // 'roster' | 'classrooms'
+  const [activeTab, setActiveTab] = useState('roster'); // 'roster' | 'classrooms' | 'password'
   const [students, setStudents] = useState([]);
   const [classrooms, setClassrooms] = useState([]);
   const [newGradeInput, setNewGradeInput] = useState('');
+
+  // Password Change state
+  const [adminUser, setAdminUser] = useState('admin');
+  const [adminPass, setAdminPass] = useState('');
+  const [adminPassConfirm, setAdminPassConfirm] = useState('');
 
   useEffect(() => {
     loadData();
@@ -20,8 +25,9 @@ export default function AdminDashboard({ onBackToMap, onConfigChange }) {
     setStudents(roster || []);
 
     const cfg = await StorageEngine.fetchConfig();
-    if (cfg && cfg.availableGrades) {
-      setClassrooms(cfg.availableGrades);
+    if (cfg) {
+      if (cfg.availableGrades) setClassrooms(cfg.availableGrades);
+      if (cfg.adminUsername) setAdminUser(cfg.adminUsername);
       if (onConfigChange) onConfigChange(cfg);
     }
   };
@@ -136,6 +142,36 @@ export default function AdminDashboard({ onBackToMap, onConfigChange }) {
     });
   };
 
+  const handleChangePasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (!adminUser.trim()) {
+      Swal.fire({ icon: 'warning', title: 'กรุณากรอกชื่อผู้ใช้งานครู!', customClass: { popup: 'swal-y2k-popup' } });
+      return;
+    }
+    if (!adminPass) {
+      Swal.fire({ icon: 'warning', title: 'กรุณากรอกรหัสผ่านใหม่!', customClass: { popup: 'swal-y2k-popup' } });
+      return;
+    }
+    if (adminPass !== adminPassConfirm) {
+      Swal.fire({ icon: 'warning', title: 'รหัสผ่านใหม่สองช่องไม่ตรงกัน!', text: 'กรุณาตรวจสอบรหัสผ่านใหม่อีกครั้ง', customClass: { popup: 'swal-y2k-popup' } });
+      return;
+    }
+
+    SoundEngine.playCorrect();
+    const updatedCfg = await StorageEngine.updateAdminCredentials(adminUser.trim(), adminPass);
+    if (onConfigChange) onConfigChange(updatedCfg);
+
+    setAdminPass('');
+    setAdminPassConfirm('');
+
+    Swal.fire({
+      icon: 'success',
+      title: '🔐 เปลี่ยนรหัสผ่านสำเร็จ!',
+      text: `อัปเดตรหัสผ่านใหม่สำหรับชื่อผู้ใช้ ${adminUser.trim()} เรียบร้อยแล้ว`,
+      customClass: { popup: 'swal-y2k-popup' }
+    });
+  };
+
   return (
     <section className="screen-view">
       <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -168,6 +204,12 @@ export default function AdminDashboard({ onBackToMap, onConfigChange }) {
             onClick={() => setActiveTab('classrooms')}
           >
             🏫 จัดการชั้นเรียน (CRUD) ({classrooms.length})
+          </button>
+          <button
+            className={`btn-y2k ${activeTab === 'password' ? 'btn-amber' : 'btn-carbon'}`}
+            onClick={() => setActiveTab('password')}
+          >
+            🔐 ตั้งค่ารหัสผ่านครู
           </button>
         </div>
 
@@ -305,6 +347,63 @@ export default function AdminDashboard({ onBackToMap, onConfigChange }) {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* TAB 3: ADMIN PASSWORD CHANGE */}
+      {activeTab === 'password' && (
+        <div className="content-card" style={{ background: '#ffffff', borderRadius: '14px', padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
+          <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#0f172a', marginBottom: '14px', textAlign: 'center' }}>
+            🔐 ตั้งค่าและเปลี่ยนรหัสผ่านเข้าสู่ระบบครูผู้สอน
+          </h3>
+
+          <form onSubmit={handleChangePasswordSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '4px', color: '#334155' }}>
+                ชื่อผู้ใช้งาน (Admin Username):
+              </label>
+              <input
+                type="text"
+                className="form-input"
+                value={adminUser}
+                onChange={(e) => setAdminUser(e.target.value)}
+                placeholder="ชื่อผู้ใช้งานครู"
+                required
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '4px', color: '#334155' }}>
+                รหัสผ่านใหม่ (New Password):
+              </label>
+              <input
+                type="password"
+                className="form-input"
+                value={adminPass}
+                onChange={(e) => setAdminPass(e.target.value)}
+                placeholder="กรอกรหัสผ่านใหม่"
+                required
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '4px', color: '#334155' }}>
+                ยืนยันรหัสผ่านใหม่ (Confirm New Password):
+              </label>
+              <input
+                type="password"
+                className="form-input"
+                value={adminPassConfirm}
+                onChange={(e) => setAdminPassConfirm(e.target.value)}
+                placeholder="กรอกรหัสผ่านใหม่อีกครั้ง"
+                required
+              />
+            </div>
+
+            <button type="submit" className="btn-y2k btn-signal btn-lg" style={{ marginTop: '10px' }}>
+              💾 บันทึกเปลี่ยนรหัสผ่านครูผู้สอน
+            </button>
+          </form>
         </div>
       )}
     </section>

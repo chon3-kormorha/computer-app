@@ -55,27 +55,24 @@ function getSymbolSVG(shapeType, color = '#3d4f97', text = '', width = 120, heig
 }
 
 export default function GameStage({ levelNum, student, onFinishLevel, onBackToMap }) {
-  // Level 1 State
+  // Generic Selection & Sequence States
   const [l1SelectedNameId, setL1SelectedNameId] = useState(null);
   const [l1Selections, setL1Selections] = useState({});
 
-  // Level 2 State
   const [l2SelectedDescId, setL2SelectedDescId] = useState(null);
   const [l2Selections, setL2Selections] = useState({});
 
-  // Level 3 State
-  const [l3Order, setL3Order] = useState([]);
+  const [sequenceOrder, setSequenceOrder] = useState([]);
 
-  // Level 4 State
-  const [l4Idx, setL4Idx] = useState(0);
-  const [l4TimeLeft, setL4TimeLeft] = useState(15);
+  const [quizIdx, setQuizIdx] = useState(0);
+  const [quizTimeLeft, setQuizTimeLeft] = useState(15);
 
-  // Level 5 State
   const [l5Selections, setL5Selections] = useState({});
 
   const LEVEL_DATA = {
     1: {
-      title: 'ด่านที่ 1: จับคู่ชื่อสัญลักษณ์กับรูปทรง',
+      title: 'ด่านที่ 1: จับคู่ชื่อสัญลักษณ์กับรูปทรง (ระดับ ป.4)',
+      gradeTag: 'ป.4',
       instructions: 'คลิกเลือก “ชื่อสัญลักษณ์” ทางซ้าย แล้วแตะการ์ดรูปทรงทางขวาเพื่อวางชื่อให้ถูกต้อง',
       items: [
         { id: 's1', name: 'Start / Stop (จุดเริ่มต้น / จุดสิ้นสุด)', shape: 'oval', color: '#ecab37' },
@@ -85,7 +82,8 @@ export default function GameStage({ levelNum, student, onFinishLevel, onBackToMa
       ]
     },
     2: {
-      title: 'ด่านที่ 2: จับคู่สัญลักษณ์กับหน้าที่การทำงาน',
+      title: 'ด่านที่ 2: จับคู่สัญลักษณ์กับหน้าที่การทำงาน (ระดับ ป.4)',
+      gradeTag: 'ป.4',
       instructions: 'เลือกหน้าที่การทำงานทางซ้าย แล้วแตะวางลงในการ์ดสัญลักษณ์ทางขวาให้ถูกต้อง',
       items: [
         { id: 'f1', name: 'Start / Stop', shape: 'oval', color: '#ecab37', desc: 'จุดเริ่มต้นหรือสิ้นสุดการทำงานของผังงาน' },
@@ -95,7 +93,8 @@ export default function GameStage({ levelNum, student, onFinishLevel, onBackToMa
       ]
     },
     3: {
-      title: 'ด่านที่ 3: เรียงลำดับขั้นตอนอัลกอริทึม (Flowchart Sequence)',
+      title: 'ด่านที่ 3: เรียงลำดับขั้นตอนแปรงฟัน (ระดับ ป.4)',
+      gradeTag: 'ป.4',
       instructions: 'กดปุ่ม ▲ ขึ้น หรือ ▼ ลง เพื่อเรียงลำดับขั้นตอนการแปรงฟันให้ถูกต้องตั้งแต่เริ่มต้นจนสิ้นสุด',
       steps: [
         { id: 1, text: '1. เริ่มต้น (Start)', shape: 'oval' },
@@ -106,35 +105,102 @@ export default function GameStage({ levelNum, student, onFinishLevel, onBackToMa
       ]
     },
     4: {
-      title: 'ด่านที่ 4: ทดสอบความไว (จับเวลา 15 วินาทีต่อข้อ)',
+      title: 'ด่านที่ 4: ทดสอบความไวเชิงตรรกะ (ระดับ ป.4)',
+      gradeTag: 'ป.4',
       instructions: 'อ่านโจทย์สัญลักษณ์แล้วเลือกคำตอบที่ถูกต้องก่อนเวลาหมด!',
       questions: [
         { q: 'สัญลักษณ์รูปข้าวหลามตัด (Diamond) หมายถึงอะไร?', options: ['การประมวลผล', 'การตัดสินใจ / เงื่อนไข', 'จุดเริ่มต้น', 'การป้อนข้อมูล'], correct: 1 },
-        { q: 'สัญลักษณ์วงกลม (Circle) มีไว้ใช้ทำอะไร?', options: ['เชื่อมต่อผังงาน', 'ต้มบะหมี่', 'แสดงผลทางจอภาพ', 'จบผังงาน'], correct: 0 },
+        { q: 'สัญลักษณ์วงกลม (Circle) มีไว้ใช้ทำอะไร?', options: ['จุดเชื่อมต่อผังงาน', 'ต้มบะหมี่', 'แสดงผลทางจอภาพ', 'จบผังงาน'], correct: 0 },
         { q: 'ลูกศรทิศทาง (Flow Line) ทำหน้าที่อะไร?', options: ['กำหนดราคา', 'บอกทิศทางการทำงาน', 'ลบข้อมูล', 'หยุดทำงาน'], correct: 1 }
       ]
     },
     5: {
-      title: 'ด่านที่ 5: Mini Challenge (ระบบกดเงิน ATM)',
-      instructions: 'เรียงลำดับบล็อกผังงานระบบตู้ ATM ให้ถูกต้องสมบูรณ์',
-      blocks: [
-        { id: 'b1', title: 'เริ่มต้น (Start)', shape: 'oval' },
-        { id: 'b2', title: 'เสียบบัตร & กรอก PIN', shape: 'trapezoid' },
-        { id: 'b3', title: 'ตรวจสอบรหัสผ่าน', shape: 'diamond' },
-        { id: 'b4', title: 'จ่ายเงินสด & สลิป', shape: 'display' },
-        { id: 'b5', title: 'สิ้นสุด (Stop)', shape: 'oval' }
+      title: 'ด่านที่ 5: การเลือกสัญลักษณ์ตามโจทย์ (ระดับ ป.5)',
+      gradeTag: 'ป.5',
+      instructions: 'เลือกสัญลักษณ์ Flowchart ที่ถูกต้องสำหรับสถานการณ์แต่ละข้อ',
+      items: [
+        { id: 'c1', label: 'หน้าจอแสดงผลตัวเลขอุณหภูมิห้อง', shape: 'display', options: ['oval', 'display', 'rectangle'], correct: 'display' },
+        { id: 'c2', label: 'จุดรวมทางเดินนัดพบหลังเคารพธงชาติ', shape: 'circle', options: ['diamond', 'circle', 'trapezoid'], correct: 'circle' },
+        { id: 'c3', label: 'คำนวณราคาขายสินค้า = ราคาทุน + กำไร', shape: 'rectangle', options: ['rectangle', 'display', 'oval'], correct: 'rectangle' }
+      ]
+    },
+    6: {
+      title: 'ด่านที่ 6: ผังงานการต้มบะหมี่สำเร็จรูป (ระดับ ป.5)',
+      gradeTag: 'ป.5',
+      instructions: 'เรียงลำดับผังงานการต้มบะหมี่ให้ถูกต้องตั้งแต่เริ่มต้น เงื่อนไขต้ม 3 นาที จนถึงใส่ชามพร้อมทาน',
+      steps: [
+        { id: 1, text: '1. เริ่มต้น (Start)', shape: 'oval' },
+        { id: 2, text: '2. ต้มน้ำในหม้อให้เดือด', shape: 'rectangle' },
+        { id: 3, text: '3. ใส่บะหมี่และเครื่องปรุงลงหม้อ', shape: 'rectangle' },
+        { id: 4, text: '4. ต้มครบ 3 นาทีหรือไม่? (Decision)', shape: 'diamond' },
+        { id: 5, text: '5. เทใส่ชามพร้อมรับประทาน', shape: 'rectangle' },
+        { id: 6, text: '6. สิ้นสุด (Stop)', shape: 'oval' }
+      ]
+    },
+    7: {
+      title: 'ด่านที่ 7: ผังงานระบบถอนเงินตู้ ATM (ระดับ ป.5)',
+      gradeTag: 'ป.5',
+      instructions: 'เรียงลำดับขั้นตอนระบบถอนเงินตู้ ATM ให้ถูกต้องสมบูรณ์',
+      steps: [
+        { id: 1, text: '1. เริ่มต้น (Start)', shape: 'oval' },
+        { id: 2, text: '2. เสียบบัตร & กรอกรหัส PIN', shape: 'trapezoid' },
+        { id: 3, text: '3. ตรวจสอบรหัสผ่านถูกต้องหรือไม่?', shape: 'diamond' },
+        { id: 4, text: '4. หักยอดเงินในบัญชี', shape: 'rectangle' },
+        { id: 5, text: '5. จ่ายเงินสด & พิมพ์สลิป', shape: 'display' },
+        { id: 6, text: '6. สิ้นสุด (Stop)', shape: 'oval' }
+      ]
+    },
+    8: {
+      title: 'ด่านที่ 8: ผังงานตรวจดัชนีมวลกาย BMI (ระดับ ป.5)',
+      gradeTag: 'ป.5',
+      instructions: 'เรียงลำดับการคำนวณและประเมินค่า BMI ของร่างกาย',
+      steps: [
+        { id: 1, text: '1. เริ่มต้น (Start)', shape: 'oval' },
+        { id: 2, text: '2. รับค่า น้ำหนัก (kg) และ ส่วนสูง (m)', shape: 'trapezoid' },
+        { id: 3, text: '3. คำนวณ BMI = น้ำหนัก / (ส่วนสูง × ส่วนสูง)', shape: 'rectangle' },
+        { id: 4, text: '4. BMI > 23 หรือไม่? (เกณฑ์เริ่มอ้วน)', shape: 'diamond' },
+        { id: 5, text: '5. แสดงผลการประเมินทางหน้าจอ', shape: 'display' },
+        { id: 6, text: '6. สิ้นสุด (Stop)', shape: 'oval' }
+      ]
+    },
+    9: {
+      title: 'ด่านที่ 9: ผังงานระบบยืนยันตัวตน เข้าสู่ระบบ (ระดับ ม.1)',
+      gradeTag: 'ม.1',
+      instructions: 'เรียงลำดับผังงานการตรวจสอบสิทธิ์การใช้งานและการล็อกอิน',
+      steps: [
+        { id: 1, text: '1. เริ่มต้น (Start)', shape: 'oval' },
+        { id: 2, text: '2. กรอก Username และ Password', shape: 'trapezoid' },
+        { id: 3, text: '3. ค้นหาผู้ใช้ในฐานข้อมูล', shape: 'rectangle' },
+        { id: 4, text: '4. ชื่อและรหัสผ่านถูกต้องหรือไม่?', shape: 'diamond' },
+        { id: 5, text: '5. เข้าสู่ระบบสำเร็จ แสดงหน้าต้อนรับ', shape: 'display' },
+        { id: 6, text: '6. สิ้นสุด (Stop)', shape: 'oval' }
+      ]
+    },
+    10: {
+      title: 'ด่านที่ 10: ผังงานการตัดสินใจเดินทางไปโรงเรียน (ระดับ ม.1)',
+      gradeTag: 'ม.1',
+      instructions: 'เรียงลำดับผังงานการตัดสินใจเลือกพาหนะตามสภาพอากาศ',
+      steps: [
+        { id: 1, text: '1. เริ่มต้น (Start)', shape: 'oval' },
+        { id: 2, text: '2. สังเกตสภาพอากาศนอกบ้าน', shape: 'rectangle' },
+        { id: 3, text: '3. ฝนตกหรือไม่? (Decision)', shape: 'diamond' },
+        { id: 4, text: '4. พกร่ม และขึ้นรถประจำทาง', shape: 'rectangle' },
+        { id: 5, text: '5. ถึงโรงเรียนอย่างปลอดภัย', shape: 'display' },
+        { id: 6, text: '6. สิ้นสุด (Stop)', shape: 'oval' }
       ]
     }
   };
 
+  const currentLevel = LEVEL_DATA[levelNum] || LEVEL_DATA[1];
+
   useEffect(() => {
-    if (levelNum === 3) {
-      const steps = [...LEVEL_DATA[3].steps];
-      setL3Order(steps.sort(() => Math.random() - 0.5));
+    if ([3, 6, 7, 8, 9, 10].includes(levelNum)) {
+      const steps = [...(currentLevel.steps || [])];
+      setSequenceOrder(steps.sort(() => Math.random() - 0.5));
     }
   }, [levelNum]);
 
-  // Level 1 Target Click
+  // LEVEL 1: Matching Names
   const handleL1TargetClick = (targetId) => {
     if (!l1SelectedNameId) {
       Swal.fire({ icon: 'info', title: 'คำแนะนำ', text: 'กรุณาแตะเลือก "ชื่อสัญลักษณ์" ทางซ้ายมือก่อนครับ', customClass: { popup: 'swal-y2k-popup' } });
@@ -156,18 +222,18 @@ export default function GameStage({ levelNum, student, onFinishLevel, onBackToMa
       onFinishLevel(1, 100, 3);
     } else {
       SoundEngine.playWrong();
-      Swal.fire({ icon: 'warning', title: 'ลองใหม่อีกครั้ง!', text: `คุณตอบถูกต้อง ${count} จาก ${items.length} ข้อครับ`, customClass: { popup: 'swal-y2k-popup' } });
+      Swal.fire({ icon: 'error', title: 'ยังไม่ถูกต้อง', text: `คุณจับคู่ถูก ${count} จาก ${items.length} ข้อ ลองใหม่อีกครั้งครับ!`, customClass: { popup: 'swal-y2k-popup' } });
     }
   };
 
-  // Level 2 Handlers
-  const handleL2TargetClick = (targetSymbolId) => {
+  // LEVEL 2: Matching Descs
+  const handleL2TargetClick = (targetId) => {
     if (!l2SelectedDescId) {
-      Swal.fire({ icon: 'info', title: 'คำแนะนำ', text: 'กรุณาแตะเลือก "หน้าที่การทำงาน" ทางซ้ายมือก่อนครับ', customClass: { popup: 'swal-y2k-popup' } });
+      Swal.fire({ icon: 'info', title: 'คำแนะนำ', text: 'กรุณาแตะเลือก "คำอธิบายหน้าที่" ทางซ้ายมือก่อนครับ', customClass: { popup: 'swal-y2k-popup' } });
       return;
     }
     SoundEngine.playClick();
-    setL2Selections(prev => ({ ...prev, [targetSymbolId]: l2SelectedDescId }));
+    setL2Selections(prev => ({ ...prev, [targetId]: l2SelectedDescId }));
   };
 
   const checkLevel2 = () => {
@@ -179,128 +245,145 @@ export default function GameStage({ levelNum, student, onFinishLevel, onBackToMa
 
     if (count === items.length) {
       SoundEngine.playCorrect();
-      onFinishLevel(2, 120, 3);
+      onFinishLevel(2, 100, 3);
     } else {
       SoundEngine.playWrong();
-      Swal.fire({ icon: 'warning', title: 'ทบทวนอีกครั้ง!', text: `คุณจับคู่ถูกต้อง ${count} จาก ${items.length} ข้อครับ`, customClass: { popup: 'swal-y2k-popup' } });
+      Swal.fire({ icon: 'error', title: 'ยังไม่ถูกต้อง', text: `คุณจับคู่ถูก ${count} จาก ${items.length} ข้อ ลองอีกครั้งครับ!`, customClass: { popup: 'swal-y2k-popup' } });
     }
   };
 
-  // Level 3 Handlers
-  const moveL3Step = (idx, dir) => {
+  // SEQUENCE LEVELS (3, 6, 7, 8, 9, 10)
+  const moveSequenceStep = (index, direction) => {
+    const newArr = [...sequenceOrder];
+    const targetIdx = index + direction;
+    if (targetIdx < 0 || targetIdx >= newArr.length) return;
     SoundEngine.playClick();
-    const targetIdx = idx + dir;
-    if (targetIdx < 0 || targetIdx >= l3Order.length) return;
-    const next = [...l3Order];
-    const temp = next[idx];
-    next[idx] = next[targetIdx];
-    next[targetIdx] = temp;
-    setL3Order(next);
+    const temp = newArr[index];
+    newArr[index] = newArr[targetIdx];
+    newArr[targetIdx] = temp;
+    setSequenceOrder(newArr);
   };
 
-  const checkLevel3 = () => {
+  const checkSequenceLevel = (lvlId) => {
     let isCorrect = true;
-    for (let i = 0; i < l3Order.length; i++) {
-      if (l3Order[i].id !== i + 1) {
+    for (let i = 0; i < sequenceOrder.length; i++) {
+      if (sequenceOrder[i].id !== i + 1) {
         isCorrect = false;
         break;
       }
     }
+
     if (isCorrect) {
       SoundEngine.playCorrect();
-      onFinishLevel(3, 150, 3);
+      onFinishLevel(lvlId, 100, 3);
     } else {
       SoundEngine.playWrong();
-      Swal.fire({ icon: 'warning', title: 'ลองสลับตำแหน่งอีกครั้ง!', text: 'สังเกตจุดเริ่มต้น (Start) และจุดสิ้นสุด (Stop) ให้ดีนะครับ', customClass: { popup: 'swal-y2k-popup' } });
+      Swal.fire({ icon: 'error', title: 'ลำดับยังไม่ถูกต้อง', text: 'ลองสังเกตตัวเลขลำดับและคำอธิบาย แล้วจัดเรียงใหม่อีกครั้งครับ!', customClass: { popup: 'swal-y2k-popup' } });
+    }
+  };
+
+  // QUIZ LEVEL (4)
+  const handleQuizAnswer = (selectedOpt) => {
+    const qData = LEVEL_DATA[4].questions[quizIdx];
+    if (selectedOpt === qData.correct) {
+      SoundEngine.playCorrect();
+      if (quizIdx + 1 < LEVEL_DATA[4].questions.length) {
+        setQuizIdx(prev => prev + 1);
+        setQuizTimeLeft(15);
+      } else {
+        onFinishLevel(4, 100, 3);
+      }
+    } else {
+      SoundEngine.playWrong();
+      Swal.fire({ icon: 'error', title: 'ตอบผิดครับ!', text: 'ลองเลือกคำตอบข้อใหม่อีกครั้ง', customClass: { popup: 'swal-y2k-popup' } });
+    }
+  };
+
+  // LEVEL 5: Option selection
+  const handleL5Choice = (itemId, shapeChoice) => {
+    SoundEngine.playClick();
+    setL5Selections(prev => ({ ...prev, [itemId]: shapeChoice }));
+  };
+
+  const checkLevel5 = () => {
+    const items = LEVEL_DATA[5].items;
+    let correctCount = 0;
+    items.forEach(it => {
+      if (l5Selections[it.id] === it.correct) correctCount++;
+    });
+
+    if (correctCount === items.length) {
+      SoundEngine.playCorrect();
+      onFinishLevel(5, 100, 3);
+    } else {
+      SoundEngine.playWrong();
+      Swal.fire({ icon: 'error', title: 'ตอบถูกไม่ครบ!', text: `คุณตอบถูก ${correctCount} จาก ${items.length} ข้อ ลองเลือกรูปทรงที่เหมาะสมอีกครั้งครับ`, customClass: { popup: 'swal-y2k-popup' } });
     }
   };
 
   return (
     <section className="screen-view">
-      <div style={{ marginBottom: '12px' }}>
+      <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <button className="btn-y2k btn-carbon btn-sm" onClick={onBackToMap}>
-          ◀ ออกจากด่าน
+          ◀ กลับหน้าแผนที่ด่าน
         </button>
+        <span className="status-badge ready" style={{ fontSize: '12px' }}>
+          สายชั้น: {currentLevel.gradeTag || 'ป.4'}
+        </span>
       </div>
 
-      <div className="game-progress-header">
-        <div>
-          <strong style={{ color: 'var(--nav-gold)' }}>{LEVEL_DATA[levelNum].title}</strong>
-          <div style={{ fontSize: '11px', opacity: 0.8 }}>
-            ผู้เล่น: {student?.name || 'นักเรียน'} ({student?.grade || 'ป.4/1'})
-          </div>
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <div className="star-rating">★ ★ ★</div>
-          <div style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--amber)' }}>ด่านที่ {levelNum}</div>
-        </div>
-      </div>
-
-      <div className="inset-panel" style={{ marginBottom: '16px' }}>
-        <span style={{ color: 'var(--signal)', fontWeight: 'bold' }}>💡 คำอธิบาย:</span> {LEVEL_DATA[levelNum].instructions}
+      <div className="hero-panel" style={{ background: 'linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)' }}>
+        <h2 className="hero-display-title">{currentLevel.title}</h2>
+        <p style={{ fontSize: '13px', color: '#ffffff', marginTop: '4px' }}>
+          {currentLevel.instructions}
+        </p>
       </div>
 
       {/* LEVEL 1 VIEW */}
       {levelNum === 1 && (
-        <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '16px', alignItems: 'start' }}>
-            <div>
-              <h4 style={{ marginBottom: '10px', color: 'var(--carbon)', fontSize: '15px' }}>🏷️ 1. เลือกชื่อสัญลักษณ์:</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+            <div className="content-card">
+              <h4 style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '10px' }}>1. แตะเลือกชื่อสัญลักษณ์:</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {LEVEL_DATA[1].items.map(item => (
-                  <div
+                  <button
                     key={item.id}
-                    className="btn-y2k btn-amber"
+                    className={`btn-y2k ${l1SelectedNameId === item.id ? 'btn-amber active' : 'btn-carbon'}`}
                     onClick={() => { SoundEngine.playClick(); setL1SelectedNameId(item.id); }}
-                    style={{
-                      textAlign: 'left',
-                      padding: '12px 14px',
-                      fontSize: '13px',
-                      outline: l1SelectedNameId === item.id ? '3px solid var(--primary)' : 'none'
-                    }}
+                    style={{ textAlign: 'left', fontSize: '12px' }}
                   >
                     {item.name}
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
 
-            <div>
-              <h4 style={{ marginBottom: '10px', color: 'var(--carbon)', fontSize: '15px' }}>📐 2. วางลงในการ์ดสัญลักษณ์:</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <div className="content-card">
+              <h4 style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '10px' }}>2. วางลงในการ์ดรูปทรง:</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {LEVEL_DATA[1].items.map(item => {
                   const assignedId = l1Selections[item.id];
-                  const assignedItem = LEVEL_DATA[1].items.find(i => i.id === assignedId);
-                  const shortLabel = assignedItem ? assignedItem.name.split(' ')[0] : '';
-
+                  const assignedItem = LEVEL_DATA[1].items.find(x => x.id === assignedId);
                   return (
                     <div
                       key={item.id}
-                      className={`flowchart-symbol-card ${assignedId ? 'selected' : ''}`}
                       onClick={() => handleL1TargetClick(item.id)}
                       style={{
-                        padding: '16px 10px',
-                        borderColor: assignedId ? '#15803d' : 'var(--chrome-indigo)',
-                        background: assignedId ? '#f0fdf4' : '#ffffff'
+                        padding: '10px',
+                        border: '2px dashed var(--chrome-indigo)',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        background: '#f8fafc'
                       }}
                     >
-                      <div className="svg-shape-wrapper">
-                        {getSymbolSVG(item.shape, item.color, shortLabel, 120, 60)}
-                      </div>
-                      <div
-                        className="l1-assigned-name"
-                        style={{
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          color: assignedId ? '#15803d' : '#64748b',
-                          marginTop: '8px',
-                          background: assignedId ? '#dcfce7' : '#f1f5f9',
-                          padding: '4px 8px',
-                          borderRadius: '6px'
-                        }}
-                      >
-                        {assignedItem ? `✓ ${assignedItem.name}` : '[ แตะวางชื่อ ]'}
-                      </div>
+                      {getSymbolSVG(item.shape, item.color, '', 90, 45)}
+                      <span style={{ fontSize: '12px', fontWeight: 'bold', color: assignedItem ? 'var(--signal)' : '#94a3b8' }}>
+                        {assignedItem ? assignedItem.name : 'แตะเพื่อวางชื่อที่นี่...'}
+                      </span>
                     </div>
                   );
                 })}
@@ -308,75 +391,61 @@ export default function GameStage({ levelNum, student, onFinishLevel, onBackToMa
             </div>
           </div>
 
-          <div style={{ marginTop: '24px', textAlign: 'center' }}>
+          <div style={{ textAlign: 'center' }}>
             <button className="btn-y2k btn-signal btn-lg" onClick={checkLevel1}>
-              ตรวจคำตอบด่านที่ 1 ➔
+              ✓ ตรวจคำตอบด่านที่ 1
             </button>
           </div>
-        </>
+        </div>
       )}
 
       {/* LEVEL 2 VIEW */}
       {levelNum === 2 && (
-        <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: '16px', alignItems: 'start' }}>
-            <div>
-              <h4 style={{ marginBottom: '10px', color: 'var(--carbon)', fontSize: '15px' }}>📜 1. แตะเลือกหน้าที่การทำงาน:</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+            <div className="content-card">
+              <h4 style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '10px' }}>1. เลือกคำอธิบายหน้าที่:</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {LEVEL_DATA[2].items.map(item => (
-                  <div
+                  <button
                     key={item.id}
-                    className="btn-y2k btn-amber"
+                    className={`btn-y2k ${l2SelectedDescId === item.id ? 'btn-amber active' : 'btn-carbon'}`}
                     onClick={() => { SoundEngine.playClick(); setL2SelectedDescId(item.id); }}
-                    style={{
-                      textAlign: 'left',
-                      padding: '12px 14px',
-                      fontSize: '13px',
-                      lineHeight: 1.4,
-                      outline: l2SelectedDescId === item.id ? '3px solid var(--primary)' : 'none'
-                    }}
+                    style={{ textAlign: 'left', fontSize: '12px', lineHeight: 1.4 }}
                   >
-                    📌 {item.desc}
-                  </div>
+                    • {item.desc}
+                  </button>
                 ))}
               </div>
             </div>
 
-            <div>
-              <h4 style={{ marginBottom: '10px', color: 'var(--carbon)', fontSize: '15px' }}>📐 2. แตะสัญลักษณ์เพื่อวางหน้าที่:</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <div className="content-card">
+              <h4 style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '10px' }}>2. วางลงในสัญลักษณ์:</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {LEVEL_DATA[2].items.map(item => {
                   const assignedId = l2Selections[item.id];
-                  const assignedItem = LEVEL_DATA[2].items.find(i => i.id === assignedId);
-
+                  const assignedItem = LEVEL_DATA[2].items.find(x => x.id === assignedId);
                   return (
                     <div
                       key={item.id}
-                      className={`flowchart-symbol-card ${assignedId ? 'selected' : ''}`}
                       onClick={() => handleL2TargetClick(item.id)}
                       style={{
-                        padding: '16px 10px',
-                        borderColor: assignedId ? '#15803d' : 'var(--chrome-indigo)',
-                        background: assignedId ? '#f0fdf4' : '#ffffff'
+                        padding: '10px',
+                        border: '2px dashed var(--amber)',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        background: '#fffbe6'
                       }}
                     >
-                      <div className="svg-shape-wrapper">
-                        {getSymbolSVG(item.shape, item.color, item.name, 120, 60)}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {getSymbolSVG(item.shape, item.color, item.name, 90, 45)}
                       </div>
-                      <div
-                        style={{
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          color: assignedId ? '#15803d' : '#64748b',
-                          marginTop: '8px',
-                          background: assignedId ? '#dcfce7' : '#f1f5f9',
-                          padding: '4px 8px',
-                          borderRadius: '6px',
-                          textAlign: 'center'
-                        }}
-                      >
-                        {assignedItem ? `✓ ${assignedItem.desc}` : '[ แตะวางหน้าที่ ]'}
-                      </div>
+                      <span style={{ fontSize: '11px', fontWeight: 'bold', color: assignedItem ? 'var(--signal)' : '#94a3b8', maxWidth: '180px', textAlign: 'right' }}>
+                        {assignedItem ? assignedItem.desc : 'แตะวางคำอธิบายที่นี่...'}
+                      </span>
                     </div>
                   );
                 })}
@@ -384,48 +453,133 @@ export default function GameStage({ levelNum, student, onFinishLevel, onBackToMa
             </div>
           </div>
 
-          <div style={{ marginTop: '24px', textAlign: 'center' }}>
+          <div style={{ textAlign: 'center' }}>
             <button className="btn-y2k btn-signal btn-lg" onClick={checkLevel2}>
-              ส่งคำตอบด่านที่ 2 ➔
+              ✓ ตรวจคำตอบด่านที่ 2
             </button>
           </div>
-        </>
+        </div>
       )}
 
-      {/* LEVEL 3 VIEW */}
-      {levelNum === 3 && (
-        <>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {l3Order.map((step, idx) => (
-              <div key={step.id} className="content-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#ffffff', borderRadius: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <span className="btn-y2k btn-amber btn-sm" style={{ fontSize: '14px', fontWeight: 'bold', width: '32px', height: '32px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{idx + 1}</span>
-                  {getSymbolSVG(step.shape, step.shape === 'oval' ? '#ecab37' : '#3d4f97', step.text, 180, 50)}
+      {/* SEQUENCE LEVELS (3, 6, 7, 8, 9, 10) */}
+      {[3, 6, 7, 8, 9, 10].includes(levelNum) && (
+        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+          <div className="content-card" style={{ marginBottom: '20px' }}>
+            <h4 style={{ fontSize: '15px', fontWeight: 'bold', marginBottom: '12px', textAlign: 'center' }}>
+              กดปุ่ม ▲ / ▼ เพื่อจัดเรียงขั้นตอนผังงานให้ถูกต้อง:
+            </h4>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {sequenceOrder.map((step, idx) => (
+                <div
+                  key={step.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '10px 14px',
+                    background: '#ffffff',
+                    border: '2px solid #cbd5e1',
+                    borderRadius: '10px',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {getSymbolSVG(step.shape || 'rectangle', '#3d4f97', '', 40, 24)}
+                    <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#1e293b' }}>{step.text}</span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button
+                      className="btn-y2k btn-carbon btn-sm"
+                      onClick={() => moveSequenceStep(idx, -1)}
+                      disabled={idx === 0}
+                      style={{ opacity: idx === 0 ? 0.4 : 1 }}
+                    >
+                      ▲ ขึ้น
+                    </button>
+                    <button
+                      className="btn-y2k btn-carbon btn-sm"
+                      onClick={() => moveSequenceStep(idx, 1)}
+                      disabled={idx === sequenceOrder.length - 1}
+                      style={{ opacity: idx === sequenceOrder.length - 1 ? 0.4 : 1 }}
+                    >
+                      ▼ ลง
+                    </button>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  <button className="btn-y2k btn-carbon btn-sm" onClick={() => moveL3Step(idx, -1)} disabled={idx === 0}>▲ ขึ้น</button>
-                  <button className="btn-y2k btn-carbon btn-sm" onClick={() => moveL3Step(idx, 1)} disabled={idx === l3Order.length - 1}>▼ ลง</button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ textAlign: 'center' }}>
+            <button className="btn-y2k btn-signal btn-lg" onClick={() => checkSequenceLevel(levelNum)}>
+              ✓ ตรวจลำดับผังงานด่านที่ {levelNum}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* LEVEL 4: TIMED QUIZ */}
+      {levelNum === 4 && (
+        <div style={{ maxWidth: '550px', margin: '0 auto' }}>
+          <div className="content-card" style={{ textAlign: 'center', padding: '24px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--systems-teal)', fontWeight: 'bold', marginBottom: '8px' }}>
+              ข้อที่ {quizIdx + 1} จาก {LEVEL_DATA[4].questions.length}
+            </div>
+
+            <h3 style={{ fontSize: '17px', fontWeight: 'bold', color: '#0f172a', marginBottom: '20px' }}>
+              {LEVEL_DATA[4].questions[quizIdx].q}
+            </h3>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {LEVEL_DATA[4].questions[quizIdx].options.map((opt, oIdx) => (
+                <button
+                  key={oIdx}
+                  className="btn-y2k btn-amber"
+                  onClick={() => handleQuizAnswer(oIdx)}
+                  style={{ padding: '12px', fontSize: '14px', textAlign: 'center' }}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* LEVEL 5: SCENARIO SYMBOL CHOICE */}
+      {levelNum === 5 && (
+        <div style={{ maxWidth: '650px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px' }}>
+            {LEVEL_DATA[5].items.map((item, idx) => (
+              <div key={item.id} className="content-card" style={{ background: '#ffffff', borderRadius: '10px' }}>
+                <h4 style={{ fontSize: '14px', fontWeight: 'bold', color: '#1e293b', marginBottom: '10px' }}>
+                  ข้อ {idx + 1}: {item.label}
+                </h4>
+
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                  {item.options.map(sh => (
+                    <button
+                      key={sh}
+                      className={`btn-y2k ${l5Selections[item.id] === sh ? 'btn-amber active' : 'btn-carbon'}`}
+                      onClick={() => handleL5Choice(item.id, sh)}
+                      style={{ padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      {getSymbolSVG(sh, '#3d4f97', '', 40, 24)}
+                      <span style={{ fontSize: '12px', textTransform: 'capitalize' }}>{sh}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
             ))}
           </div>
 
-          <div style={{ marginTop: '24px', textAlign: 'center' }}>
-            <button className="btn-y2k btn-signal btn-lg" onClick={checkLevel3}>
-              ตรวจสอบลำดับ Flowchart ➔
+          <div style={{ textAlign: 'center' }}>
+            <button className="btn-y2k btn-signal btn-lg" onClick={checkLevel5}>
+              ✓ ตรวจคำตอบด่านที่ 5
             </button>
           </div>
-        </>
-      )}
-
-      {/* LEVEL 4 & 5 VIEWS */}
-      {(levelNum === 4 || levelNum === 5) && (
-        <div style={{ textAlign: 'center', padding: '30px', background: '#ffffff', borderRadius: '12px', border: '2px solid var(--chrome-indigo)' }}>
-          <h3>🎉 พร้อมลุยด่านที่ {levelNum}!</h3>
-          <p style={{ margin: '12px 0', fontSize: '14px', color: '#475569' }}>ทดสอบความเข้าใจผังงานคำนวณเรียบร้อยแล้ว</p>
-          <button className="btn-y2k btn-signal btn-lg" onClick={() => { SoundEngine.playCorrect(); onFinishLevel(levelNum, 200, 3); }}>
-            ส่งคำตอบด่านที่ {levelNum} ➔
-          </button>
         </div>
       )}
     </section>

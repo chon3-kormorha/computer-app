@@ -70,7 +70,7 @@ export default function Home() {
       score: (currentStudent?.score || 0) + score,
       stars: (currentStudent?.stars || 0) + stars,
       levelsCompleted: completed,
-      certificateIssued: completed.length >= 5
+      certificateIssued: completed.length >= 10
     });
 
     setCurrentStudent(updated);
@@ -96,8 +96,8 @@ export default function Home() {
     Swal.fire({
       title: '🔑 เข้าสู่ระบบครูผู้สอน',
       html: `
-        <input id="admin-user" class="swal2-input" placeholder="ชื่อผู้ใช้งาน (admin)">
-        <input id="admin-pass" type="password" class="swal2-input" placeholder="รหัสผ่าน (admin1234)">
+        <input id="admin-user" class="swal2-input" placeholder="ชื่อผู้ใช้งานครู">
+        <input id="admin-pass" type="password" class="swal2-input" placeholder="รหัสผ่านเข้าสู่ระบบครู">
       `,
       focusConfirm: false,
       showCancelButton: true,
