@@ -15,7 +15,7 @@ const P4_TOPICS = [
     id: 'p4_1',
     emoji: '🖥️',
     title: 'คอมพิวเตอร์และระบบดิจิทัลรอบตัวเรา',
-    color: '#3d4f97',
+    color: '#1d4ed8',
     sections: [
       {
         type: 'intro',
@@ -50,7 +50,7 @@ const P4_TOPICS = [
     id: 'p4_2',
     emoji: '📊',
     title: 'ข้อมูลและสารสนเทศ (Data & Information)',
-    color: '#206479',
+    color: '#0284c7',
     sections: [
       {
         type: 'intro',
@@ -83,7 +83,7 @@ const P4_TOPICS = [
     id: 'p4_3',
     emoji: '📐',
     title: 'ผังงาน (Flowchart) สัญลักษณ์พื้นฐาน',
-    color: '#ecab37',
+    color: '#d97706',
     sections: [
       {
         type: 'intro',
@@ -92,10 +92,10 @@ const P4_TOPICS = [
       {
         type: 'symbol_grid',
         symbols: [
-          { shape: 'oval',      color: '#ecab37', name: 'Start / Stop',   desc: 'จุดเริ่มต้นและสิ้นสุดของผังงาน' },
-          { shape: 'rectangle', color: '#3d4f97', name: 'Process',        desc: 'การทำงาน คำนวณ หรือประมวลผล' },
-          { shape: 'diamond',   color: '#f68d1f', name: 'Decision',       desc: 'การตัดสินใจ มีทางแยก ใช่/ไม่ใช่' },
-          { shape: 'arrow',     color: '#206479', name: 'Flow Line',      desc: 'ลูกศรบอกทิศทางการไหลของงาน' }
+          { shape: 'oval',      color: '#d97706', name: 'Start / Stop',   desc: 'จุดเริ่มต้นและสิ้นสุดของผังงาน' },
+          { shape: 'rectangle', color: '#1d4ed8', name: 'Process',        desc: 'การทำงาน คำนวณ หรือประมวลผล' },
+          { shape: 'diamond',   color: '#ea580c', name: 'Decision',       desc: 'การตัดสินใจ มีทางแยก ใช่/ไม่ใช่' },
+          { shape: 'arrow',     color: '#0284c7', name: 'Flow Line',      desc: 'ลูกศรบอกทิศทางการไหลของงาน' }
         ]
       },
       {
@@ -147,7 +147,7 @@ const P4_TOPICS = [
     id: 'p4_5',
     emoji: '🌐',
     title: 'การสืบค้นข้อมูลบนอินเทอร์เน็ต',
-    color: '#e60012',
+    color: '#dc2626',
     sections: [
       {
         type: 'intro',
@@ -180,7 +180,7 @@ const P4_TOPICS = [
     id: 'p4_6',
     emoji: '🔒',
     title: 'ความปลอดภัยและจริยธรรมดิจิทัล',
-    color: '#1e293b',
+    color: '#475569',
     sections: [
       {
         type: 'intro',
@@ -219,7 +219,7 @@ const P5_TOPICS = [
     id: 'p5_1',
     emoji: '🧮',
     title: 'การคิดเชิงคำนวณ (Computational Thinking)',
-    color: '#3d4f97',
+    color: '#1d4ed8',
     sections: [
       {
         type: 'intro',
@@ -254,7 +254,7 @@ const P5_TOPICS = [
     id: 'p5_2',
     emoji: '📐',
     title: 'สัญลักษณ์ Flowchart ขั้นสูงทั้งหมด',
-    color: '#ecab37',
+    color: '#d97706',
     sections: [
       {
         type: 'intro',
@@ -263,13 +263,13 @@ const P5_TOPICS = [
       {
         type: 'symbol_grid',
         symbols: [
-          { shape: 'oval',      color: '#ecab37', name: 'Start / Stop',   desc: 'จุดเริ่มต้น/สิ้นสุด' },
-          { shape: 'rectangle', color: '#3d4f97', name: 'Process',        desc: 'ประมวลผล/คำนวณ' },
-          { shape: 'diamond',   color: '#f68d1f', name: 'Decision',       desc: 'ตัดสินใจ/เงื่อนไข' },
-          { shape: 'trapezoid', color: '#acace7', name: 'Manual Input',   desc: 'ป้อนข้อมูลทางคีย์บอร์ด' },
-          { shape: 'display',   color: '#8ba1d4', name: 'Display',        desc: 'แสดงผลบนจอภาพ' },
-          { shape: 'circle',    color: '#e60012', name: 'Connector',      desc: 'จุดเชื่อมต่อผังงาน' },
-          { shape: 'arrow',     color: '#206479', name: 'Flow Line',      desc: 'ทิศทางการไหล' }
+          { shape: 'oval',      color: '#d97706', name: 'Start / Stop',   desc: 'จุดเริ่มต้น/สิ้นสุด' },
+          { shape: 'rectangle', color: '#1d4ed8', name: 'Process',        desc: 'ประมวลผล/คำนวณ' },
+          { shape: 'diamond',   color: '#ea580c', name: 'Decision',       desc: 'ตัดสินใจ/เงื่อนไข' },
+          { shape: 'trapezoid', color: '#6366f1', name: 'Manual Input',   desc: 'ป้อนข้อมูลทางคีย์บอร์ด' },
+          { shape: 'display',   color: '#0284c7', name: 'Display',        desc: 'แสดงผลบนจอภาพ' },
+          { shape: 'circle',    color: '#dc2626', name: 'Connector',      desc: 'จุดเชื่อมต่อผังงาน' },
+          { shape: 'arrow',     color: '#0f766e', name: 'Flow Line',      desc: 'ทิศทางการไหล' }
         ]
       },
       {
@@ -315,7 +315,7 @@ const P5_TOPICS = [
     id: 'p5_4',
     emoji: '🔍',
     title: 'การประเมินและเปรียบเทียบข้อมูลออนไลน์',
-    color: '#f68d1f',
+    color: '#ea580c',
     sections: [
       {
         type: 'intro',
@@ -348,7 +348,7 @@ const P5_TOPICS = [
     id: 'p5_5',
     emoji: '🛡️',
     title: 'Cyberbullying และการปกป้องตัวเองออนไลน์',
-    color: '#e60012',
+    color: '#dc2626',
     sections: [
       {
         type: 'intro',
@@ -384,7 +384,7 @@ const P5_TOPICS = [
     id: 'p5_6',
     emoji: '⚖️',
     title: 'สิทธิ์ ลิขสิทธิ์ และจริยธรรมดิจิทัล',
-    color: '#206479',
+    color: '#0284c7',
     sections: [
       {
         type: 'intro',
@@ -438,25 +438,25 @@ function SymbolSVG({ shape, color, size = 100 }) {
   );
 }
 
-// ── Section Renderers ─────────────────────────────────────────────────────────
+// ── Section Renderers High Contrast ──────────────────────────────────────────
 function renderSection(section, idx) {
   switch (section.type) {
     case 'intro':
       return (
-        <div key={idx} style={{ background: '#f0f9ff', border: '2px solid #38bdf8', borderRadius: '12px', padding: '16px', marginBottom: '14px' }}>
-          <p style={{ fontSize: '15px', lineHeight: 1.7, color: '#0c4a6e', margin: 0 }}>{section.text}</p>
+        <div key={idx} style={{ background: '#f8fafc', borderLeft: '5px solid #0284c7', border: '1px solid #cbd5e1', borderLeftWidth: '5px', borderRadius: '12px', padding: '18px', marginBottom: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+          <p style={{ fontSize: '16px', lineHeight: 1.7, color: '#0f172a', fontWeight: '500', margin: 0 }}>{section.text}</p>
         </div>
       );
     case 'concept_cards':
       return (
-        <div key={idx} style={{ marginBottom: '14px' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: 'bold', color: '#1e293b', marginBottom: '10px' }}>{section.title}</h4>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px' }}>
+        <div key={idx} style={{ marginBottom: '16px' }}>
+          <h4 style={{ fontSize: '15px', fontWeight: 'bold', color: '#0f172a', marginBottom: '12px' }}>{section.title}</h4>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
             {section.items.map((item, i) => (
-              <div key={i} style={{ background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '10px', padding: '12px', boxShadow: '0 2px 6px rgba(0,0,0,0.05)' }}>
-                <div style={{ fontSize: '24px', marginBottom: '6px' }}>{item.icon}</div>
-                <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#1e293b', marginBottom: '4px' }}>{item.label}</div>
-                <div style={{ fontSize: '12px', color: '#64748b' }}>{item.desc}</div>
+              <div key={i} style={{ background: '#ffffff', border: '2px solid #cbd5e1', borderRadius: '12px', padding: '14px', boxShadow: '0 2px 6px rgba(0,0,0,0.05)' }}>
+                <div style={{ fontSize: '28px', marginBottom: '8px' }}>{item.icon}</div>
+                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#0f172a', marginBottom: '4px' }}>{item.label}</div>
+                <div style={{ fontSize: '13px', color: '#334155', lineHeight: 1.4 }}>{item.desc}</div>
               </div>
             ))}
           </div>
@@ -464,41 +464,41 @@ function renderSection(section, idx) {
       );
     case 'examples':
       return (
-        <div key={idx} style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: '12px', padding: '14px', marginBottom: '14px' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: 'bold', color: '#14532d', marginBottom: '8px' }}>{section.title}</h4>
+        <div key={idx} style={{ background: '#f0fdf4', border: '2px solid #22c55e', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
+          <h4 style={{ fontSize: '15px', fontWeight: 'bold', color: '#14532d', marginBottom: '10px' }}>{section.title}</h4>
           <ul style={{ margin: 0, paddingLeft: '20px' }}>
             {section.items.map((item, i) => (
-              <li key={i} style={{ fontSize: '14px', color: '#166534', marginBottom: '5px', lineHeight: 1.5 }}>{item}</li>
+              <li key={i} style={{ fontSize: '15px', color: '#14532d', marginBottom: '6px', lineHeight: 1.5, fontWeight: '500' }}>{item}</li>
             ))}
           </ul>
         </div>
       );
     case 'compare':
       return (
-        <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
-          <div style={{ background: '#fef2f2', border: '2px solid #fca5a5', borderRadius: '10px', padding: '12px' }}>
-            <h4 style={{ fontSize: '13px', fontWeight: 'bold', color: '#991b1b', marginBottom: '8px' }}>{section.leftTitle}</h4>
-            <ul style={{ margin: 0, paddingLeft: '16px' }}>
-              {section.leftItems.map((item, i) => <li key={i} style={{ fontSize: '12px', color: '#7f1d1d', marginBottom: '4px' }}>{item}</li>)}
+        <div key={idx} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px', marginBottom: '16px' }}>
+          <div style={{ background: '#fef2f2', border: '2px solid #ef4444', borderRadius: '12px', padding: '14px' }}>
+            <h4 style={{ fontSize: '14px', fontWeight: 'bold', color: '#7f1d1d', marginBottom: '8px' }}>{section.leftTitle}</h4>
+            <ul style={{ margin: 0, paddingLeft: '18px' }}>
+              {section.leftItems.map((item, i) => <li key={i} style={{ fontSize: '13px', color: '#7f1d1d', marginBottom: '4px', fontWeight: '500' }}>{item}</li>)}
             </ul>
           </div>
-          <div style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: '10px', padding: '12px' }}>
-            <h4 style={{ fontSize: '13px', fontWeight: 'bold', color: '#14532d', marginBottom: '8px' }}>{section.rightTitle}</h4>
-            <ul style={{ margin: 0, paddingLeft: '16px' }}>
-              {section.rightItems.map((item, i) => <li key={i} style={{ fontSize: '12px', color: '#166534', marginBottom: '4px' }}>{item}</li>)}
+          <div style={{ background: '#f0fdf4', border: '2px solid #22c55e', borderRadius: '12px', padding: '14px' }}>
+            <h4 style={{ fontSize: '14px', fontWeight: 'bold', color: '#14532d', marginBottom: '8px' }}>{section.rightTitle}</h4>
+            <ul style={{ margin: 0, paddingLeft: '18px' }}>
+              {section.rightItems.map((item, i) => <li key={i} style={{ fontSize: '13px', color: '#14532d', marginBottom: '4px', fontWeight: '500' }}>{item}</li>)}
             </ul>
           </div>
         </div>
       );
     case 'symbol_grid':
       return (
-        <div key={idx} style={{ marginBottom: '14px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '10px' }}>
+        <div key={idx} style={{ marginBottom: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '12px' }}>
             {section.symbols.map((sym, i) => (
-              <div key={i} style={{ background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '10px', padding: '10px', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.05)' }}>
+              <div key={i} style={{ background: '#ffffff', border: '2px solid #cbd5e1', borderRadius: '12px', padding: '12px', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.05)' }}>
                 <SymbolSVG shape={sym.shape} color={sym.color} size={70} />
-                <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#1e293b', marginTop: '6px' }}>{sym.name}</div>
-                <div style={{ fontSize: '11px', color: '#64748b', marginTop: '3px' }}>{sym.desc}</div>
+                <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#0f172a', marginTop: '6px' }}>{sym.name}</div>
+                <div style={{ fontSize: '12px', color: '#334155', marginTop: '3px' }}>{sym.desc}</div>
               </div>
             ))}
           </div>
@@ -506,8 +506,8 @@ function renderSection(section, idx) {
       );
     case 'think':
       return (
-        <div key={idx} style={{ background: 'linear-gradient(135deg, #fef3c7, #fde68a)', border: '2px solid #f59e0b', borderRadius: '12px', padding: '14px', marginBottom: '14px' }}>
-          <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#78350f', margin: 0, lineHeight: 1.6 }}>{section.question}</p>
+        <div key={idx} style={{ background: '#fffbeb', border: '2px solid #f59e0b', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
+          <p style={{ fontSize: '15px', fontWeight: 'bold', color: '#78350f', margin: 0, lineHeight: 1.6 }}>{section.question}</p>
         </div>
       );
     default:
@@ -546,7 +546,7 @@ export default function TutorialScreen({ student, onGoToMap, onOpenCertificate }
         setTimeOnTopic(prev => prev + 1);
       }, 1000);
     } else {
-      setTimeOnTopic(61); // already confirmed, show as complete
+      setTimeOnTopic(61);
     }
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [currentIdx, isCurrentConfirmed]);
@@ -591,137 +591,139 @@ export default function TutorialScreen({ student, onGoToMap, onOpenCertificate }
   const timerPercent = Math.min(100, (timeOnTopic / 60) * 100);
 
   return (
-    <section className="screen-view">
-      {/* HEADER */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+    <section className="screen-view" style={{ background: '#f1f5f9', padding: '20px', borderRadius: '16px' }}>
+      {/* HEADER BAR */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', background: '#ffffff', padding: '12px 16px', borderRadius: '12px', border: '2px solid #cbd5e1', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
         <button className="btn-y2k btn-carbon btn-sm" onClick={onGoToMap}>◀ กลับหน้าแผนที่</button>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <span className="status-badge ready" style={{ fontSize: '12px' }}>
-            {gradeTrack === 'p5' ? '🎒 ป.5-ป.6' : '🎒 ป.4'}
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <span className="status-badge ready" style={{ fontSize: '13px', background: '#2563eb', color: '#ffffff', border: 'none' }}>
+            {gradeTrack === 'p5' ? '🎒 ป.5 - ป.6' : '🎒 ป.4'}
           </span>
-          <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#334155' }}>
+          <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#0f172a' }}>
             เรียนรู้แล้ว {confirmedIds.filter(id => requiredIds.includes(id)).length} / {requiredIds.length} บท
           </span>
         </div>
       </div>
 
-      <div className="hero-panel" style={{ background: 'linear-gradient(135deg, #1b4332 0%, #2d6a4f 50%, #1e5f74 100%)', marginBottom: '16px', padding: '14px 18px' }}>
-        <h2 className="hero-display-title" style={{ fontSize: '18px', margin: 0 }}>📚 คลังเรียนรู้วิทยาการคำนวณ</h2>
-        <p style={{ fontSize: '13px', color: '#a7f3d0', marginTop: '4px' }}>
+      {/* HERO TITLE */}
+      <div className="hero-panel" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', border: '2px solid #334155', borderRadius: '12px', marginBottom: '20px', padding: '18px 24px' }}>
+        <h2 className="hero-display-title" style={{ fontSize: '22px', margin: 0, color: '#ffffff', textShadow: 'none' }}>📚 คลังเรียนรู้วิทยาการคำนวณ</h2>
+        <p style={{ fontSize: '14px', color: '#94a3b8', marginTop: '6px', fontWeight: '500' }}>
           เรียนรู้ให้ครบทุกบทเพื่อปลดล็อกด่านเกมส์ — ต้องใช้เวลาอย่างน้อย 60 วินาทีต่อบท และยืนยันการเรียนรู้ก่อน
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '16px' }}>
+      {/* MAIN LAYOUT: Top Selector Tabs + Main Content Card */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-        {/* LEFT SIDEBAR: Topic List */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#475569', marginBottom: '4px', paddingLeft: '4px' }}>
-            📋 บทเรียนตามลำดับ:
+        {/* TOP TOPIC SELECTOR (Horizontal Tabs) */}
+        <div style={{ background: '#ffffff', border: '2px solid #cbd5e1', borderRadius: '14px', padding: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+          <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#475569', marginBottom: '10px', paddingLeft: '4px' }}>
+            📋 ลำดับบทเรียน (ต้องเรียนตามลำดับ):
           </div>
-          {topics.map((topic, idx) => {
-            const isUnlocked = idx === 0 || confirmedIds.includes(topics[idx - 1]?.id);
-            const isConfirmed = confirmedIds.includes(topic.id);
-            const isCurrent = idx === currentIdx;
-            return (
-              <button
-                key={topic.id}
-                onClick={() => handleSelectTopic(idx)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  padding: '10px 12px',
-                  borderRadius: '10px',
-                  border: isCurrent ? `2px solid ${topic.color}` : '2px solid #e2e8f0',
-                  background: isCurrent ? `${topic.color}18` : isConfirmed ? '#f0fdf4' : isUnlocked ? '#ffffff' : '#f8fafc',
-                  cursor: isUnlocked ? 'pointer' : 'not-allowed',
-                  textAlign: 'left',
-                  transition: 'all 0.2s',
-                  opacity: isUnlocked ? 1 : 0.5
-                }}
-              >
-                <span style={{ fontSize: '20px' }}>{isConfirmed ? '✅' : isUnlocked ? topic.emoji : '🔒'}</span>
-                <div>
-                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: isCurrent ? topic.color : '#1e293b' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '8px' }}>
+            {topics.map((topic, idx) => {
+              const isUnlocked = idx === 0 || confirmedIds.includes(topics[idx - 1]?.id);
+              const isConfirmed = confirmedIds.includes(topic.id);
+              const isCurrent = idx === currentIdx;
+              return (
+                <button
+                  key={topic.id}
+                  onClick={() => handleSelectTopic(idx)}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '10px 8px',
+                    borderRadius: '10px',
+                    border: isCurrent ? '3px solid #2563eb' : '2px solid #cbd5e1',
+                    background: isCurrent ? '#eff6ff' : isConfirmed ? '#f0fdf4' : isUnlocked ? '#ffffff' : '#f8fafc',
+                    cursor: isUnlocked ? 'pointer' : 'not-allowed',
+                    textAlign: 'center',
+                    transition: 'all 0.15s ease',
+                    opacity: isUnlocked ? 1 : 0.6
+                  }}
+                >
+                  <div style={{ fontSize: '20px', marginBottom: '4px' }}>
+                    {isConfirmed ? '✅' : isUnlocked ? topic.emoji : '🔒'}
+                  </div>
+                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: isCurrent ? '#1d4ed8' : '#0f172a' }}>
                     บทที่ {idx + 1}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#64748b', lineHeight: 1.3, marginTop: '1px' }}>
-                    {topic.title.length > 28 ? topic.title.substring(0, 28) + '…' : topic.title}
+                  <div style={{ fontSize: '11px', color: '#475569', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                    {topic.title}
                   </div>
-                </div>
-              </button>
-            );
-          })}
-
-          {allDone && (
-            <div style={{ marginTop: '12px', background: 'linear-gradient(135deg, #065f46, #047857)', borderRadius: '10px', padding: '12px', textAlign: 'center' }}>
-              <div style={{ fontSize: '20px', marginBottom: '4px' }}>🎉</div>
-              <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#a7f3d0' }}>ครบทุกบทแล้ว!</div>
-              <div style={{ fontSize: '11px', color: '#6ee7b7', marginTop: '2px' }}>พร้อมเล่นด่านเกมส์</div>
-              <button className="btn-y2k btn-signal btn-sm" style={{ marginTop: '8px', width: '100%' }} onClick={onGoToMap}>
-                🎮 เล่นเกม
-              </button>
-            </div>
-          )}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* RIGHT: Content Area */}
-        <div>
-          {/* Topic Header */}
+        {/* MAIN CONTENT CONTAINER (No Inner Scrollbar - High Contrast) */}
+        <div style={{ background: '#ffffff', border: '2px solid #cbd5e1', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+
+          {/* TOPIC HEADER CARD */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
-            background: `linear-gradient(135deg, ${currentTopic.color}22, ${currentTopic.color}08)`,
-            border: `2px solid ${currentTopic.color}44`,
+            gap: '16px',
+            background: '#f8fafc',
+            border: `2px solid ${currentTopic.color}`,
             borderRadius: '12px',
-            padding: '14px 16px',
-            marginBottom: '16px'
+            padding: '16px 20px',
+            marginBottom: '20px'
           }}>
-            <span style={{ fontSize: '32px' }}>{currentTopic.emoji}</span>
+            <span style={{ fontSize: '38px' }}>{currentTopic.emoji}</span>
             <div>
-              <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>บทที่ {currentIdx + 1} จาก {topics.length}</div>
-              <h3 style={{ fontSize: '17px', fontWeight: 'bold', color: '#0f172a', margin: '2px 0 0 0' }}>{currentTopic.title}</h3>
+              <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                บทที่ {currentIdx + 1} จาก {topics.length}
+              </span>
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#0f172a', margin: '2px 0 0 0' }}>
+                {currentTopic.title}
+              </h3>
             </div>
           </div>
 
-          {/* Content Sections */}
-          <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '6px', marginBottom: '14px' }}>
+          {/* ALL SECTIONS (Rendered full height, no scroll box) */}
+          <div style={{ marginBottom: '24px' }}>
             {currentTopic.sections.map((section, idx) => renderSection(section, idx))}
           </div>
 
-          {/* Timer & Confirm Section */}
+          {/* TIMER & CONFIRMATION BOX */}
           <div style={{
             background: isCurrentConfirmed ? '#f0fdf4' : '#fffbeb',
-            border: `2px solid ${isCurrentConfirmed ? '#86efac' : '#fcd34d'}`,
-            borderRadius: '12px',
-            padding: '14px'
+            border: `2px solid ${isCurrentConfirmed ? '#22c55e' : '#f59e0b'}`,
+            borderRadius: '14px',
+            padding: '20px'
           }}>
             {isCurrentConfirmed ? (
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '22px', marginBottom: '4px' }}>✅</div>
-                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#14532d' }}>ยืนยันการเรียนรู้บทนี้แล้ว</div>
-                {canReadNext && (
-                  <button className="btn-y2k btn-signal btn-sm" style={{ marginTop: '10px' }} onClick={() => setCurrentIdx(prev => prev + 1)}>
-                    บทถัดไป ➔
-                  </button>
-                )}
-                {!canReadNext && !allDone && (
-                  <div style={{ fontSize: '12px', color: '#64748b', marginTop: '6px' }}>นี่คือบทสุดท้ายของคุณ ✨</div>
-                )}
+                <div style={{ fontSize: '28px', marginBottom: '4px' }}>✅</div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#14532d' }}>คุณได้ศึกษาและยืนยันบทเรียนนี้แล้ว</div>
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '14px' }}>
+                  {canReadNext && (
+                    <button className="btn-y2k btn-signal btn-lg" onClick={() => setCurrentIdx(prev => prev + 1)}>
+                      ไปยังบทถัดไป ➔
+                    </button>
+                  )}
+                  {allDone && (
+                    <button className="btn-y2k btn-signal btn-lg" onClick={onGoToMap}>
+                      🎮 เข้าสู่แผนที่เล่นเกม
+                    </button>
+                  )}
+                </div>
               </div>
             ) : (
               <div>
-                {/* Timer Bar */}
-                <div style={{ marginBottom: '10px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#92400e' }}>⏱️ เวลาศึกษา:</span>
-                    <span style={{ fontSize: '13px', fontWeight: 'bold', color: secondsRemaining > 0 ? '#d97706' : '#15803d' }}>
-                      {secondsRemaining > 0 ? `อีก ${secondsRemaining} วินาที` : '✅ ครบ 60 วินาทีแล้ว!'}
+                <div style={{ marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#78350f' }}>⏱️ เวลาศึกษาบทเรียน:</span>
+                    <span style={{ fontSize: '15px', fontWeight: 'bold', color: secondsRemaining > 0 ? '#b45309' : '#15803d' }}>
+                      {secondsRemaining > 0 ? `อีก ${secondsRemaining} วินาที` : '✅ พร้อมยืนยันแล้ว!'}
                     </span>
                   </div>
-                  <div style={{ background: '#e5e7eb', borderRadius: '999px', height: '10px', overflow: 'hidden' }}>
+                  <div style={{ background: '#e2e8f0', borderRadius: '999px', height: '14px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
                     <div style={{
                       width: `${timerPercent}%`,
                       height: '100%',
@@ -738,19 +740,23 @@ export default function TutorialScreen({ student, onGoToMap, onOpenCertificate }
                   disabled={timeOnTopic < 60}
                   style={{
                     width: '100%',
+                    padding: '14px',
+                    fontSize: '16px',
                     opacity: timeOnTopic < 60 ? 0.5 : 1,
                     cursor: timeOnTopic < 60 ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  {timeOnTopic >= 60 ? '✅ ยืนยันการเรียนรู้บทนี้' : `📖 กำลังศึกษา... (อีก ${secondsRemaining} วินาที)`}
+                  {timeOnTopic >= 60 ? '✅ ยืนยันการเรียนรู้บทนี้' : `📖 กรุณาอ่านศึกษาเนื้อหา... (อีก ${secondsRemaining} วินาที)`}
                 </button>
-                <p style={{ fontSize: '11px', color: '#78350f', marginTop: '6px', textAlign: 'center' }}>
-                  อ่านเนื้อหาให้ครบ 60 วินาทีแล้วกดยืนยันเพื่อไปยังบทถัดไป
+                <p style={{ fontSize: '12px', color: '#78350f', marginTop: '8px', textAlign: 'center', fontWeight: '500' }}>
+                  ศึกษาเนื้อหาอย่างน้อย 60 วินาที แล้วกดยืนยันเพื่อปลดล็อกบทถัดไป
                 </p>
               </div>
             )}
           </div>
+
         </div>
+
       </div>
     </section>
   );
