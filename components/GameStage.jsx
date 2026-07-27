@@ -78,11 +78,11 @@ const P4_LEVELS = {
     gradeTag: 'ป.4', type: 'sequence',
     instructions: 'กดปุ่ม ▲ / ▼ เรียงลำดับขั้นตอนให้ถูกต้องจากบนลงล่าง',
     steps: [
-      { id: 1, text: '1. เริ่มต้น (Start)',               shape: 'oval'      },
-      { id: 2, text: '2. บีบยาสีฟันลงบนแปรงฟัน',         shape: 'rectangle' },
-      { id: 3, text: '3. แปรงฟันให้สะอาด 2 นาที',         shape: 'rectangle' },
-      { id: 4, text: '4. บ้วนปากด้วยน้ำสะอาด',            shape: 'rectangle' },
-      { id: 5, text: '5. สิ้นสุด (Stop)',                  shape: 'oval'      }
+      { id: 1, text: 'เริ่มต้น (Start)',               shape: 'oval'      },
+      { id: 2, text: 'บีบยาสีฟันลงบนแปรงฟัน',         shape: 'rectangle' },
+      { id: 3, text: 'แปรงฟันให้สะอาด 2 นาที',         shape: 'rectangle' },
+      { id: 4, text: 'บ้วนปากด้วยน้ำสะอาด',            shape: 'rectangle' },
+      { id: 5, text: 'สิ้นสุด (Stop)',                  shape: 'oval'      }
     ]
   },
   4: {
@@ -90,12 +90,12 @@ const P4_LEVELS = {
     gradeTag: 'ป.4', type: 'sequence',
     instructions: 'กดปุ่ม ▲ / ▼ เรียงลำดับขั้นตอนการล้างมือตามสุขอนามัยให้ถูกต้อง',
     steps: [
-      { id: 1, text: '1. เริ่มต้น (Start)',                shape: 'oval'      },
-      { id: 2, text: '2. ราดน้ำให้มือเปียก',               shape: 'rectangle' },
-      { id: 3, text: '3. ถูสบู่ให้เกิดฟอง 20 วินาที',      shape: 'rectangle' },
-      { id: 4, text: '4. ล้างมือด้วยน้ำสะอาด',             shape: 'rectangle' },
-      { id: 5, text: '5. เช็ดมือให้แห้งด้วยผ้าสะอาด',     shape: 'rectangle' },
-      { id: 6, text: '6. สิ้นสุด (Stop)',                   shape: 'oval'      }
+      { id: 1, text: 'เริ่มต้น (Start)',                shape: 'oval'      },
+      { id: 2, text: 'ราดน้ำให้มือเปียก',               shape: 'rectangle' },
+      { id: 3, text: 'ถูสบู่ให้เกิดฟอง 20 วินาที',      shape: 'rectangle' },
+      { id: 4, text: 'ล้างมือด้วยน้ำสะอาด',             shape: 'rectangle' },
+      { id: 5, text: 'เช็ดมือให้แห้งด้วยผ้าสะอาด',     shape: 'rectangle' },
+      { id: 6, text: 'สิ้นสุด (Stop)',                   shape: 'oval'      }
     ]
   },
   5: {
@@ -154,13 +154,13 @@ const P4_LEVELS = {
     gradeTag: 'ป.4', type: 'sequence',
     instructions: 'เรียงลำดับผังงานการตัดสินใจเดินทางมาโรงเรียนให้ถูกต้อง',
     steps: [
-      { id: 1, text: '1. เริ่มต้น (Start)',                     shape: 'oval'      },
-      { id: 2, text: '2. ตื่นนอนและแต่งกายเครื่องแบบนักเรียน',  shape: 'rectangle' },
-      { id: 3, text: '3. สังเกตสภาพอากาศนอกบ้าน',               shape: 'rectangle' },
-      { id: 4, text: '4. ฝนตกหรือไม่?',                         shape: 'diamond'   },
-      { id: 5, text: '5. พกร่มและขึ้นรถโรงเรียน',                shape: 'rectangle' },
-      { id: 6, text: '6. ถึงโรงเรียนอย่างปลอดภัย',               shape: 'display'   },
-      { id: 7, text: '7. สิ้นสุด (Stop)',                         shape: 'oval'      }
+      { id: 1, text: 'เริ่มต้น (Start)',                     shape: 'oval'      },
+      { id: 2, text: 'ตื่นนอนและแต่งกายเครื่องแบบนักเรียน',  shape: 'rectangle' },
+      { id: 3, text: 'สังเกตสภาพอากาศนอกบ้าน',               shape: 'rectangle' },
+      { id: 4, text: 'ฝนตกหรือไม่?',                         shape: 'diamond'   },
+      { id: 5, text: 'พกร่มและขึ้นรถโรงเรียน',                shape: 'rectangle' },
+      { id: 6, text: 'ถึงโรงเรียนอย่างปลอดภัย',               shape: 'display'   },
+      { id: 7, text: 'สิ้นสุด (Stop)',                         shape: 'oval'      }
     ]
   }
 };
@@ -181,12 +181,12 @@ const P5_LEVELS = {
     gradeTag: 'ป.5', type: 'sequence',
     instructions: 'เรียงลำดับผังงานการต้มบะหมี่สำเร็จรูปให้ถูกต้อง พร้อมเงื่อนไขต้มครบ 3 นาที',
     steps: [
-      { id: 1, text: '1. เริ่มต้น (Start)',              shape: 'oval'      },
-      { id: 2, text: '2. ต้มน้ำในหม้อให้เดือด',          shape: 'rectangle' },
-      { id: 3, text: '3. ใส่บะหมี่และเครื่องปรุง',       shape: 'rectangle' },
-      { id: 4, text: '4. ต้มครบ 3 นาทีหรือไม่?',         shape: 'diamond'   },
-      { id: 5, text: '5. เทใส่ชามพร้อมรับประทาน',        shape: 'rectangle' },
-      { id: 6, text: '6. สิ้นสุด (Stop)',                 shape: 'oval'      }
+      { id: 1, text: 'เริ่มต้น (Start)',              shape: 'oval'      },
+      { id: 2, text: 'ต้มน้ำในหม้อให้เดือด',          shape: 'rectangle' },
+      { id: 3, text: 'ใส่บะหมี่และเครื่องปรุง',       shape: 'rectangle' },
+      { id: 4, text: 'ต้มครบ 3 นาทีหรือไม่?',         shape: 'diamond'   },
+      { id: 5, text: 'เทใส่ชามพร้อมรับประทาน',        shape: 'rectangle' },
+      { id: 6, text: 'สิ้นสุด (Stop)',                 shape: 'oval'      }
     ]
   },
   13: {
@@ -194,12 +194,12 @@ const P5_LEVELS = {
     gradeTag: 'ป.5', type: 'sequence',
     instructions: 'เรียงลำดับขั้นตอนระบบถอนเงินตู้ ATM ให้ถูกต้องสมบูรณ์',
     steps: [
-      { id: 1, text: '1. เริ่มต้น (Start)',                   shape: 'oval'      },
-      { id: 2, text: '2. เสียบบัตร & กรอกรหัส PIN',           shape: 'trapezoid' },
-      { id: 3, text: '3. ตรวจสอบรหัสผ่านถูกต้องหรือไม่?',    shape: 'diamond'   },
-      { id: 4, text: '4. หักยอดเงินในบัญชี',                  shape: 'rectangle' },
-      { id: 5, text: '5. จ่ายเงินสด & พิมพ์สลิป',            shape: 'display'   },
-      { id: 6, text: '6. สิ้นสุด (Stop)',                      shape: 'oval'      }
+      { id: 1, text: 'เริ่มต้น (Start)',                   shape: 'oval'      },
+      { id: 2, text: 'เสียบบัตร & กรอกรหัส PIN',           shape: 'trapezoid' },
+      { id: 3, text: 'ตรวจสอบรหัสผ่านถูกต้องหรือไม่?',    shape: 'diamond'   },
+      { id: 4, text: 'หักยอดเงินในบัญชี',                  shape: 'rectangle' },
+      { id: 5, text: 'จ่ายเงินสด & พิมพ์สลิป',            shape: 'display'   },
+      { id: 6, text: 'สิ้นสุด (Stop)',                      shape: 'oval'      }
     ]
   },
   14: {
@@ -207,12 +207,12 @@ const P5_LEVELS = {
     gradeTag: 'ป.5', type: 'sequence',
     instructions: 'เรียงลำดับการคำนวณและประเมินค่า BMI ของร่างกาย',
     steps: [
-      { id: 1, text: '1. เริ่มต้น (Start)',                              shape: 'oval'      },
-      { id: 2, text: '2. รับค่าน้ำหนัก (kg) และส่วนสูง (m)',            shape: 'trapezoid' },
-      { id: 3, text: '3. คำนวณ BMI = น้ำหนัก / (ส่วนสูง × ส่วนสูง)',   shape: 'rectangle' },
-      { id: 4, text: '4. BMI > 23 หรือไม่? (เกณฑ์เริ่มอ้วน)',           shape: 'diamond'   },
-      { id: 5, text: '5. แสดงผลการประเมินทางหน้าจอ',                    shape: 'display'   },
-      { id: 6, text: '6. สิ้นสุด (Stop)',                                 shape: 'oval'      }
+      { id: 1, text: 'เริ่มต้น (Start)',                              shape: 'oval'      },
+      { id: 2, text: 'รับค่าน้ำหนัก (kg) และส่วนสูง (m)',            shape: 'trapezoid' },
+      { id: 3, text: 'คำนวณ BMI = น้ำหนัก / (ส่วนสูง × ส่วนสูง)',   shape: 'rectangle' },
+      { id: 4, text: 'BMI > 23 หรือไม่? (เกณฑ์เริ่มอ้วน)',           shape: 'diamond'   },
+      { id: 5, text: 'แสดงผลการประเมินทางหน้าจอ',                    shape: 'display'   },
+      { id: 6, text: 'สิ้นสุด (Stop)',                                 shape: 'oval'      }
     ]
   },
   15: {
@@ -220,12 +220,12 @@ const P5_LEVELS = {
     gradeTag: 'ป.5', type: 'sequence',
     instructions: 'เรียงลำดับผังงานตัดเกรดจากคะแนนสอบให้ถูกต้อง',
     steps: [
-      { id: 1, text: '1. เริ่มต้น (Start)',            shape: 'oval'      },
-      { id: 2, text: '2. รับคะแนนสอบจากนักเรียน',      shape: 'trapezoid' },
-      { id: 3, text: '3. คะแนน ≥ 80 หรือไม่?',          shape: 'diamond'   },
-      { id: 4, text: '4. แสดงเกรด "A" บนหน้าจอ',       shape: 'display'   },
-      { id: 5, text: '5. ตรวจสอบเกณฑ์เกรดถัดไป',        shape: 'diamond'   },
-      { id: 6, text: '6. สิ้นสุด (Stop)',               shape: 'oval'      }
+      { id: 1, text: 'เริ่มต้น (Start)',            shape: 'oval'      },
+      { id: 2, text: 'รับคะแนนสอบจากนักเรียน',      shape: 'trapezoid' },
+      { id: 3, text: 'คะแนน ≥ 80 หรือไม่?',          shape: 'diamond'   },
+      { id: 4, text: 'แสดงเกรด "A" บนหน้าจอ',       shape: 'display'   },
+      { id: 5, text: 'ตรวจสอบเกณฑ์เกรดถัดไป',        shape: 'diamond'   },
+      { id: 6, text: 'สิ้นสุด (Stop)',               shape: 'oval'      }
     ]
   },
   16: {
@@ -274,13 +274,13 @@ const P5_LEVELS = {
     gradeTag: 'ป.5', type: 'sequence',
     instructions: 'เรียงลำดับผังงานระบบยืนยันตัวตนด้วยบัตรสมาร์ทการ์ดให้สมบูรณ์',
     steps: [
-      { id: 1, text: '1. เริ่มต้น (Start)',                      shape: 'oval'      },
-      { id: 2, text: '2. แตะบัตรสมาร์ทการ์ดที่เครื่องอ่าน',      shape: 'trapezoid' },
-      { id: 3, text: '3. ระบบอ่านข้อมูลในบัตร',                  shape: 'rectangle' },
-      { id: 4, text: '4. ข้อมูลบัตรถูกต้องหรือไม่?',             shape: 'diamond'   },
-      { id: 5, text: '5. แสดงชื่อและสิทธิ์การเข้าถึง',           shape: 'display'   },
-      { id: 6, text: '6. บันทึกเวลาเข้าออกในระบบ',               shape: 'rectangle' },
-      { id: 7, text: '7. สิ้นสุด (Stop)',                          shape: 'oval'      }
+      { id: 1, text: 'เริ่มต้น (Start)',                      shape: 'oval'      },
+      { id: 2, text: 'แตะบัตรสมาร์ทการ์ดที่เครื่องอ่าน',      shape: 'trapezoid' },
+      { id: 3, text: 'ระบบอ่านข้อมูลในบัตร',                  shape: 'rectangle' },
+      { id: 4, text: 'ข้อมูลบัตรถูกต้องหรือไม่?',             shape: 'diamond'   },
+      { id: 5, text: 'แสดงชื่อและสิทธิ์การเข้าถึง',           shape: 'display'   },
+      { id: 6, text: 'บันทึกเวลาเข้าออกในระบบ',               shape: 'rectangle' },
+      { id: 7, text: 'สิ้นสุด (Stop)',                          shape: 'oval'      }
     ]
   }
 };
@@ -382,7 +382,7 @@ export default function GameStage({ levelNum, student, onFinishLevel, onBackToMa
       onFinishLevel(levelNum, 100, 3);
     } else {
       SoundEngine.playWrong();
-      Swal.fire({ icon: 'error', title: 'ลำดับยังไม่ถูกต้อง!', text: 'ลองสังเกตตัวเลขลำดับและปรับเรียงใหม่อีกครั้ง', customClass: { popup: 'swal-y2k-popup' } });
+      Swal.fire({ icon: 'error', title: 'ลำดับยังไม่ถูกต้อง!', text: 'ลองสังเกตขั้นตอนและปรับเรียงใหม่อีกครั้ง', customClass: { popup: 'swal-y2k-popup' } });
     }
   };
 
