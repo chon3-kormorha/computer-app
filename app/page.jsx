@@ -31,7 +31,14 @@ export default function Home() {
     const saved = StorageEngine.getCurrentStudent();
     if (saved && saved.name) {
       setCurrentStudent(saved);
-      setCurrentScreen('student-map-screen');
+      // Check if student completed tutorial
+      const topics = Array.isArray(saved.tutorialTopicsCompleted) ? saved.tutorialTopicsCompleted : [];
+      const requiredLength = saved.grade?.startsWith('ป.5') || saved.grade?.startsWith('ป.6') ? 6 : 6;
+      if (topics.length < requiredLength) {
+        setCurrentScreen('tutorial-screen');
+      } else {
+        setCurrentScreen('student-map-screen');
+      }
     } else {
       setCurrentStudent(null);
       setCurrentScreen('login-screen');
