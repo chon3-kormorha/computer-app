@@ -637,8 +637,9 @@ export default function TutorialScreen({ student, onGoToMap, onOpenCertificate }
                     justifyContent: 'center',
                     padding: '10px 8px',
                     borderRadius: '10px',
-                    border: isCurrent ? '3px solid #2563eb' : '2px solid #cbd5e1',
-                    background: isCurrent ? '#eff6ff' : isConfirmed ? '#f0fdf4' : isUnlocked ? '#ffffff' : '#f8fafc',
+                    border: isCurrent ? '3px solid #2563eb' : isConfirmed ? '2px solid #22c55e' : '2px solid #cbd5e1',
+                    background: isCurrent ? '#ffffff' : isConfirmed ? '#f0fdf4' : isUnlocked ? '#ffffff' : '#f1f5f9',
+                    boxShadow: isCurrent ? '0 0 0 3px rgba(37, 99, 235, 0.3)' : '0 2px 4px rgba(0,0,0,0.05)',
                     cursor: isUnlocked ? 'pointer' : 'not-allowed',
                     textAlign: 'center',
                     transition: 'all 0.15s ease',
@@ -648,10 +649,10 @@ export default function TutorialScreen({ student, onGoToMap, onOpenCertificate }
                   <div style={{ fontSize: '20px', marginBottom: '4px' }}>
                     {isConfirmed ? '✅' : isUnlocked ? topic.emoji : '🔒'}
                   </div>
-                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: isCurrent ? '#1d4ed8' : '#0f172a' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 'bold', color: isCurrent ? '#1d4ed8' : '#0f172a' }}>
                     บทที่ {idx + 1}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#475569', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                  <div style={{ fontSize: '11px', color: isCurrent ? '#1e40af' : '#334155', marginTop: '2px', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
                     {topic.title}
                   </div>
                 </button>
@@ -668,15 +669,16 @@ export default function TutorialScreen({ student, onGoToMap, onOpenCertificate }
             display: 'flex',
             alignItems: 'center',
             gap: '16px',
-            background: '#f8fafc',
-            border: `2px solid ${currentTopic.color}`,
+            background: '#ffffff',
+            border: `3px solid ${currentTopic.color}`,
             borderRadius: '12px',
             padding: '16px 20px',
-            marginBottom: '20px'
+            marginBottom: '20px',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.05)'
           }}>
             <span style={{ fontSize: '38px' }}>{currentTopic.emoji}</span>
             <div>
-              <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#1e293b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 บทที่ {currentIdx + 1} จาก {topics.length}
               </span>
               <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#0f172a', margin: '2px 0 0 0' }}>
